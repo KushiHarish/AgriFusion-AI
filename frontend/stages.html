@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Crop Workflow - AgriFusion</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("https://www.shutterstock.com/image-photo/farmer-rice-field-green-plant-600nw-1766373442.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .workflow-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .side {
+      width: 25%;
+      background: rgba(0, 0, 0, 0.65);
+      padding: 15px;
+      border-radius: 12px;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+
+    h3 {
+      color: #ffd54f;
+      margin-top: 0;
+    }
+
+    ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+
+    /* Center Circle Container */
+    .circle-container {
+      position: relative;
+      width: 480px;
+      height: 480px;
+      margin: auto;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .center {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffeb3b;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .circle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 140px;
+      height: 45px;
+      text-align: center;
+      line-height: 45px;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: all 0.3s;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .circle:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(1.15);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="workflow-container">
+
+    <!-- Left Side -->
+    <div class="side left">
+      <h3>Modern Methods</h3>
+      <ul>
+        <li><strong>Hydroponics:</strong> Soil-less farming using nutrient-rich water.</li>
+        <li><strong>Vertical Farming:</strong> Stacked indoor growing to save space and water.</li>
+        <li><strong>Smart Irrigation:</strong> Sensor-based watering for efficiency.</li>
+      </ul>
+    </div>
+
+    <!-- Center Circle Section -->
+    <div class="circle-container" id="circleContainer">
+      <div class="center" id="cropName">🌾 Crop Name</div>
+
+      <!-- Circular Stages (Removed Soil Test) -->
+      <a href="#" class="circle">Seed Selection</a>
+      <a href="#" class="circle">Irrigation</a>
+      <a href="#" class="circle">Fertilizers</a>
+      <a href="#" class="circle">Pest Control</a>
+      <a href="#" class="circle">Harvesting</a>
+      <a href="#" class="circle">Storage</a>
+      <a href="#" class="circle">Next Crop</a>
+    </div>
+
+    <!-- Right Side -->
+    <div class="side right">
+      <h3>Government Schemes</h3>
+      <ul>
+        <li><strong>PM-Kisan Yojana:</strong> ₹6,000 annual income support for small farmers.</li>
+        <li><strong>Soil Health Card:</strong> Tracks soil nutrients and guides fertilizer use.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    // ✅ Set crop name dynamically
+    const selectedCrop = localStorage.getItem("selectedCrop") || "Your Crop";
+    document.getElementById("cropName").innerText = `🌾 ${selectedCrop}`;
+
+    // ✅ Arrange circles in a perfect circular pattern
+    const circles = document.querySelectorAll(".circle");
+    const container = document.getElementById("circleContainer");
+    const radius = 200; // distance from center
+    const total = circles.length;
+
+    circles.forEach((circle, index) => {
+      const angle = (index / total) * (2 * Math.PI);
+      const x = Math.cos(angle) * radius + container.clientWidth / 2 - circle.offsetWidth / 2;
+      const y = Math.sin(angle) * radius + container.clientHeight / 2 - circle.offsetHeight / 2;
+      circle.style.left = `${x}px`;
+      circle.style.top = `${y}px`;
+    });
+
+    // Optional: click alert
+    circles.forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        alert(`Stage: ${btn.innerText} for ${selectedCrop}`);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Farmer Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>👨‍🌾 Welcome, Farmer!</h1>
+  <p>Here you can view soil reports, get crop recommendations, and monitor your farm activities.</p>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+  // Simple access check
+  const role = localStorage.getItem("userRole");
+  if (role !== "farmer") {
+    alert("Access denied!");
+    window.location.href = "login.html";
+  }
+
+  // Optional: auto-redirect farmer to soil test after a short delay
+  setTimeout(() => {
+    window.location.href = "frontend/soil_test.html";
+  }, 2000); // 2 seconds
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+</script>
+</body>
+</html>

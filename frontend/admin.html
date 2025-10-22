@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🧑‍💼 Welcome, Admin!</h1>
+  <p>Manage user accounts, monitor activities, and approve new crop data or policies.</p>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    const role = localStorage.getItem("userRole");
+    if (role !== "admin") {
+      alert("Access denied!");
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!-- frontend/soil_test.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Soil Test - AgriFusion</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="login">
+    <div class="form-box">
+      <h2>Soil Test - Get Crop Recommendation</h2>
+      <form id="soilForm">
+        <div class="input-group"><label>N (Nitrogen)</label><input id="N" type="number" step="0.1" required></div>
+        <div class="input-group"><label>P (Phosphorus)</label><input id="P" type="number" step="0.1" required></div>
+        <div class="input-group"><label>K (Potassium)</label><input id="K" type="number" step="0.1" required></div>
+        <div class="input-group"><label>Temperature (in degree Celsius)</label><input id="temperature" type="number" step="0.1" required></div>
+        <div class="input-group"><label>Humidity (in %)</label><input id="humidity" type="number" step="0.1" required></div>
+        <div class="input-group"><label>pH</label><input id="ph" type="number" step="0.1" required></div>
+        <div class="input-group"><label>Rainfall (in mm)</label><input id="rainfall" type="number" step="0.1" required></div>
+        <button type="submit">Get Recommendation</button>
+      </form>
+      <div id="result" style="margin-top:12px;font-weight:bold;"></div>
+    </div>
+  </div>
+
+  <script>
+  document.getElementById('soilForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      N: parseFloat(document.getElementById('N').value),
+      P: parseFloat(document.getElementById('P').value),
+      K: parseFloat(document.getElementById('K').value),
+      temperature: parseFloat(document.getElementById('temperature').value),
+      humidity: parseFloat(document.getElementById('humidity').value),
+      ph: parseFloat(document.getElementById('ph').value),
+      rainfall: parseFloat(document.getElementById('rainfall').value)
+    };
+
+    const username = localStorage.getItem("username") || "guest";
+    document.getElementById('result').innerText = "Predicting...";
+
+    try {
+      const res = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        const crop = data.prediction;
+        document.getElementById('result').innerHTML = `
+          Recommended crop: <b>${crop}</b><br><br>
+          <button id="continueBtn">Continue to Crop Selection</button>
+        `;
+
+        // Save to MongoDB
+        await fetch("http://localhost:5001/save-soiltest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, username, predictedCrop: crop })
+        });
+
+        // Save to localStorage for later use
+        localStorage.setItem("predictedCrop", crop);
+
+        // Add button listener dynamically
+        document.getElementById('continueBtn').addEventListener('click', () => {
+          window.location.href = "crop.html";
+        });
+
+      } else {
+        document.getElementById('result').innerText = "Error: " + (data.error || JSON.stringify(data));
+      }
+    } catch (err) {
+      document.getElementById('result').innerText = "Network error: " + err.message;
+    }
+  });
+</script>
+
+</body>
+</html>

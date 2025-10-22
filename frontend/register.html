@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register - AgriFusion</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* small extra spacing for the combined form */
+    .form-box { max-width: 600px; margin: 30px auto; }
+    .two-col { display: flex; gap: 10px; }
+    .two-col .input-group { flex:1; }
+    .section-title { margin-top: 18px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="login">
+    <div class="form-box">
+      <h2>Register</h2>
+
+      <form id="registerForm">
+        <!-- Account -->
+        <div class="section-title">Account</div>
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required>
+        </div>
+
+        <div class="two-col">
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required>
+          </div>
+          <div class="input-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>User Role</label>
+          <label><input type="radio" name="role" value="farmer" checked> Farmer</label>
+          <label><input type="radio" name="role" value="admin"> Admin</label>
+          <label><input type="radio" name="role" value="customer"> Customer</label>
+        </div>
+
+        <!-- Personal details -->
+        <div class="section-title">Personal Details</div>
+        <div class="input-group">
+          <label for="fullName">Full name</label>
+          <input id="fullName" name="fullName" type="text" required>
+        </div>
+
+        <div class="two-col">
+          <div class="input-group">
+            <label for="age">Age</label>
+            <input id="age" name="age" type="number" min="10" max="120" required>
+          </div>
+          <div class="input-group">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email">
+        </div>
+
+        <div class="input-group">
+          <label for="address">Address</label>
+          <input id="address" name="address" type="text">
+        </div>
+
+        <!-- Land details -->
+        <div class="section-title">Land Details</div>
+
+        <div class="two-col">
+          <div class="input-group">
+            <label for="climate">Climate of the area</label>
+            <input id="climate" name="climate" type="text" placeholder="eg: tropical / temperate" required>
+          </div>
+
+          <div class="input-group">
+            <label for="landSize">Size of Land</label>
+            <input id="landSize" name="landSize" type="number" step="0.01" placeholder="eg: 2.5" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="landUnits">Units</label>
+          <select id="landUnits" name="landUnits">
+            <option value="acres">Acres</option>
+            <option value="hectares">Hectares</option>
+            <option value="sq_m">Sq. meters</option>
+          </select>
+        </div>
+
+        <div class="two-col">
+          <div class="input-group">
+            <label for="waterSource">Water Source</label>
+            <select id="waterSource" name="waterSource" required>
+              <option value="">-- Select --</option>
+              <option value="canal">Canal</option>
+              <option value="river">River</option>
+              <option value="well">Well</option>
+              <option value="rainfed">Rainfed</option>
+              <option value="borewell">Borewell</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="previousCrop">Previous Crop Planted</label>
+            <input id="previousCrop" name="previousCrop" type="text">
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="input-group">
+            <label for="soilType">Soil Type</label>
+            <select id="soilType" name="soilType" required>
+              <option value="">-- Select --</option>
+              <option value="clay">Clay</option>
+              <option value="sandy">Sandy</option>
+              <option value="loamy">Loamy</option>
+              <option value="silty">Silty</option>
+              <option value="peaty">Peaty</option>
+              <option value="saline">Saline</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="irrigationPref">Preferred Irrigation</label>
+            <select id="irrigationPref" name="irrigationPref" required>
+              <option value="">-- Select --</option>
+              <option value="drip">Drip</option>
+              <option value="sprinkler">Sprinkler</option>
+              <option value="flood">Flood</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <button type="submit">Register</button>
+        </div>
+      </form>
+
+      <p style="margin-top:12px;">Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // basic client-side validation
+      const pwd = document.getElementById('password').value;
+      const cpwd = document.getElementById('confirmPassword').value;
+      if (pwd !== cpwd) {
+        alert('Passwords do not match');
+        return;
+      }
+
+      // collect payload
+      const payload = {
+        username: document.getElementById('username').value.trim(),
+        password: pwd,
+        role: document.querySelector('input[name="role"]:checked').value,
+        fullName: document.getElementById('fullName').value.trim(),
+        age: parseInt(document.getElementById('age').value,10),
+        phone: document.getElementById('phone').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        address: document.getElementById('address').value.trim(),
+
+        // land details
+        land: {
+          climate: document.getElementById('climate').value.trim(),
+          size: parseFloat(document.getElementById('landSize').value),
+          units: document.getElementById('landUnits').value,
+          waterSource: document.getElementById('waterSource').value,
+          previousCrop: document.getElementById('previousCrop').value.trim(),
+          soilType: document.getElementById('soilType').value,
+          irrigationPref: document.getElementById('irrigationPref').value
+        }
+      };
+
+      try {
+        const res = await fetch('http://localhost:5001/register', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message || 'Registered successfully. Please login.');
+          // redirect to login
+          window.location.href = 'login.html';
+        } else {
+          alert(data.message || 'Registration failed: ' + JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Network error: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
