@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Irrigation Methods - AgriFusion</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .content {
+      max-width: 850px;
+      margin: 50px auto;
+      background:hsla(0, 0%, 4%, 0.6);
+      padding: 30px;
+      border-radius: 12px;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+    h2, h3 {
+      color: #daff09;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #fff;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #0288d1;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0277bd;
+    }
+    /* small helper for the crop-specific lists */
+    .crop-list {
+      text-align: left;
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body class="login">
+  <div class="content">
+    <h2>💧 Irrigation Methods</h2>
+
+    <h3>Common Irrigation Techniques</h3>
+    <table>
+      <tr>
+        <th>Method</th>
+        <th>Advantage</th>
+        <th>Disadvantage</th>
+        <th>Water Usage</th>
+        <th>Cost</th>
+        <th>Suitable Crops</th>
+      </tr>
+      <tr>
+        <td>Drip Irrigation</td>
+        <td>Drip irrigation provides efficient water use by delivering water directly to plant roots, reducing wastage and promoting better crop yield.</td>
+        <td>It has a high initial installation cost and requires regular maintenance to prevent clogging of emitters.</td>
+        <td>Low</td>
+        <td>Medium–High</td>
+        <td>Grapes, Maize, Tomato</td>
+      </tr>
+      <tr>
+        <td>Sprinkler System</td>
+        <td>Sprinkler irrigation ensures uniform water distribution and is suitable for most soil types and crops.</td>
+        <td>It has high energy and maintenance costs and can lead to water loss through evaporation and wind drift.</td>
+        <td>Moderate</td>
+        <td>Medium</td>
+        <td>Maize, Potato, Wheat</td>
+      </tr>
+      <tr>
+        <td>Surface Irrigation</td>
+        <td>Surface irrigation is simple, low-cost, and easy to manage without the need for complex equipment.</td>
+        <td>It leads to uneven water distribution and high water loss through runoff and deep percolation.</td>
+        <td>High</td>
+        <td>Low</td>
+        <td>Paddy, Sugarcane</td>
+      </tr>
+    </table>
+
+    <h3>Tip:</h3>
+    <p>Use sensor-based irrigation controllers to optimize water use and crop health.</p>
+
+    <!-- Insert crop-specific irrigation recommendations HERE (after irrigation table, before farming methods) -->
+    <div id="cropIrrigation" style="margin-top: 18px;"></div>
+
+    <h2> 🌱 Farming Methods </h2>
+    <table>
+      <tr>
+        <th>Farming Method</th>
+        <th>Advantages</th>
+        <th>Disadvantage</th>
+        <th>Cost</th>
+        <th>Productivity</th>
+        <th>Water Requirement</th>
+        <th>Ideal Crop</th>
+      </tr>
+      <tr>
+        <td>1. Organic Farming</td>
+        <td>Eco-friendly, improves soil fertility, and produces chemical-free food.</td>
+        <td>Lower yield compared to conventional farming; labor-intensive.</td>
+        <td>Moderate</td>
+        <td>Moderate</td>
+        <td>Moderate</td>
+        <td>Vegetables, pulses, fruits, spices, cereals (like wheat, rice).</td>
+      </tr>
+      <tr>
+        <td>2. Greenhouse / Polyhouse Farming</td>
+        <td>Year-round cultivation, weather protection, higher yields.</td>
+        <td>High setup and maintenance cost; requires skilled management.</td>
+        <td>High</td>
+        <td>High</td>
+        <td>Low-Moderate</td>
+        <td>Tomatoes, cucumbers, capsicum, flowers (rose, gerbera), strawberries.</td>
+      </tr>
+      <tr>
+        <td>3.Hydroponics</td>
+        <td>No soil needed, high yield in small space, water-efficient.</td>
+        <td>High initial investment, needs technical knowledge and power backup.</td>
+        <td>Very High</td>
+        <td>Very High</td>
+        <td>Very Low (up to 90% less than traditional farming)</td>
+        <td>Lettuce, spinach, basil, tomatoes, strawberries.</td>
+      </tr>
+      <tr>
+        <td>4.Vertical Farming</td>
+        <td>Space-saving, suitable for urban areas, climate-controlled, highly productive.</td>
+        <td>Very expensive setup, high energy demand.</td>
+        <td>Very High</td>
+        <td>Very High</td>
+        <td>Very Low</td>
+        <td>Leafy greens, herbs, microgreens.</td>
+      </tr>
+      <tr>
+        <td>5.Precision Farming</td>
+        <td>Optimal resource use, higher efficiency and yield, real-time monitoring.</td>
+        <td>Requires advanced technology, costly equipment, and data analysis.</td>
+        <td>High</td>
+        <td>High</td>
+        <td>Low to moderate</td>
+        <td>Cereals (wheat, rice), cotton, maize, sugarcane, horticultural crops.</td>
+      </tr>
+    </table>
+
+    <!-- Insert crop-specific farming recommendations HERE (after farming table, before the Back button) -->
+    <div id="cropFarming" style="margin-top: 18px;"></div>
+
+    <button onclick="window.location.href='stages.html'">⬅ Back to Stages</button>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const crop = localStorage.getItem("selectedCrop");
+  const irrigContainer = document.getElementById("cropIrrigation");
+  const farmContainer = document.getElementById("cropFarming");
+
+  // If no crop selected, show a friendly message in the irrigation container only
+  if (!crop) {
+    irrigContainer.innerHTML = `<p style="color: #ffeb3b;">⚠ Please select a crop in the Crop Selection page to see crop-specific recommendations.</p>`;
+    return;
+  }
+
+  // Crop-specific data — extend or update as needed
+  const cropData = {
+    "Maize": {
+      irrigation: [
+        { method: "Drip Irrigation", reason: "Efficient water delivery and reduced wastage." },
+        { method: "Sprinkler System", reason: "Ensures uniform water distribution for field crops like maize." }
+      ],
+      farming: [
+        { method: "Precision Farming", reason: "Optimizes water & nutrient use for higher yields." },
+        { method: "Organic Farming", reason: "Improves soil health and long-term sustainability." }
+      ]
+    },
+    "Grapes": {
+      irrigation: [
+        { method: "Drip Irrigation", reason: "Delivers water to roots, reduces fungal risks." }
+      ],
+      farming: [
+        { method: "Greenhouse / Polyhouse Farming", reason: "Protects vines and allows environment control." },
+        { method: "Precision Farming", reason: "Monitors vine health and irrigation precisely." }
+      ]
+    },
+    "Orange": {
+      irrigation: [
+        { method: "Drip Irrigation", reason: "Prevents waterlogging, reduces disease risk." }
+      ],
+      farming: [
+        { method: "Organic Farming", reason: "Improves fruit quality and soil fertility." }
+      ]
+    },
+    "Potato": {
+      irrigation: [
+        { method: "Sprinkler System", reason: "Provides even moisture for tuber growth." }
+      ],
+      farming: [
+        { method: "Precision Farming", reason: "Reduces over/under watering and fertilizer waste." },
+        { method: "Organic Farming", reason: "Better soil structure and market value for organic potatoes." }
+      ]
+    },
+    "Pepper": {
+      irrigation: [
+        { method: "Drip Irrigation", reason: "Delivers consistent moisture to the root zone." }
+      ],
+      farming: [
+        { method: "Greenhouse / Polyhouse Farming", reason: "Helps control humidity and pests." },
+        { method: "Hydroponics", reason: "Can give high yields in controlled setups." }
+      ]
+    }
+  };
+
+  const info = cropData[crop];
+
+  if (!info) {
+    // If we don't have crop-specific data, show a small message below irrigation table
+    irrigContainer.innerHTML = `
+      <h3 style="color:#daff09; margin-top: 8px;">💧 Recommended Irrigation for ${crop}</h3>
+      <p>No specific irrigation recommendations available for <strong>${crop}</strong>. Showing general information above.</p>
+    `;
+    farmContainer.innerHTML = `
+      <h3 style="color:#daff09; margin-top: 8px;">🌱 Recommended Farming Methods for ${crop}</h3>
+      <p>No specific farming recommendations available for <strong>${crop}</strong>. Showing general information above.</p>
+    `;
+    return;
+  }
+
+  // Build irrigation HTML and insert into irrigContainer
+  const irrigationHTML = `
+    <h3 style="color:#daff09; margin-top: 8px;">💧 Recommended Irrigation for ${crop}</h3>
+    <ul class="crop-list">
+      ${info.irrigation.map(i => `<li><strong>${i.method}</strong>: ${i.reason}</li>`).join('')}
+    </ul>
+  `;
+  irrigContainer.innerHTML = irrigationHTML;
+
+  // Build farming HTML and insert into farmContainer
+  const farmingHTML = `
+    <h3 style="color:#daff09; margin-top: 8px;">🌱 Recommended Farming Methods for ${crop}</h3>
+    <ul class="crop-list">
+      ${info.farming.map(f => `<li><strong>${f.method}</strong>: ${f.reason}</li>`).join('')}
+    </ul>
+  `;
+  farmContainer.innerHTML = farmingHTML;
+});
+</script>
+
+</body>
+</html>

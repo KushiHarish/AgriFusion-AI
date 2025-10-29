@@ -71,17 +71,19 @@
 
     .circle {
       position: absolute;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      width: 140px;
-      height: 45px;
+      background: hsla(125, 77%, 49%, 0.25);
+      color: #ffeb3b;
+      width: 150px;
+      height: 100px;
       text-align: center;
-      line-height: 45px;
+      line-height: 50px;
       border-radius: 25px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
       text-decoration: none;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 17px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
 
     .circle:hover {
@@ -108,14 +110,14 @@
     <div class="circle-container" id="circleContainer">
       <div class="center" id="cropName">🌾 Crop Name</div>
 
-      <!-- Circular Stages (Removed Soil Test) -->
-      <a href="#" class="circle">Seed Selection</a>
-      <a href="#" class="circle">Irrigation</a>
-      <a href="#" class="circle">Fertilizers</a>
-      <a href="#" class="circle">Pest Control</a>
-      <a href="#" class="circle">Harvesting</a>
-      <a href="#" class="circle">Storage</a>
-      <a href="#" class="circle">Next Crop</a>
+      <!-- Circular Stages (Soil Test Removed) -->
+      <a href="#" class="circle" data-stage="seed">Seed Selection</a>
+      <a href="#" class="circle" data-stage="irrigation">Irrigation and Farming Methods</a>
+      <a href="#" class="circle" data-stage="fertilizer">Fertilizers Recommendation</a>
+      <a href="#" class="circle" data-stage="pest">Pest Control</a>
+      <a href="#" class="circle" data-stage="harvest">Harvesting</a>
+      <a href="#" class="circle" data-stage="storage">Storage</a>
+      <a href="#" class="circle" data-stage="next">Next Crop</a>
     </div>
 
     <!-- Right Side -->
@@ -128,33 +130,47 @@
     </div>
 
   </div>
+<script>
+  // ✅ Set crop name dynamically
+  const selectedCrop = localStorage.getItem("selectedCrop") || "Your Crop";
+  document.getElementById("cropName").innerText = `🌾 ${selectedCrop}`;
 
-  <script>
-    // ✅ Set crop name dynamically
-    const selectedCrop = localStorage.getItem("selectedCrop") || "Your Crop";
-    document.getElementById("cropName").innerText = `🌾 ${selectedCrop}`;
+  // ✅ Arrange circles in a perfect circular pattern
+  const circles = document.querySelectorAll(".circle");
+  const container = document.getElementById("circleContainer");
+  const radius = 200;
+  const total = circles.length;
 
-    // ✅ Arrange circles in a perfect circular pattern
-    const circles = document.querySelectorAll(".circle");
-    const container = document.getElementById("circleContainer");
-    const radius = 200; // distance from center
-    const total = circles.length;
+  circles.forEach((circle, index) => {
+    const angle = (index / total) * (2 * Math.PI);
+    const x = Math.cos(angle) * radius + container.clientWidth / 2 - circle.offsetWidth / 2;
+    const y = Math.sin(angle) * radius + container.clientHeight / 2 - circle.offsetHeight / 2;
+    circle.style.left = `${x}px`;
+    circle.style.top = `${y}px`;
+  });
 
-    circles.forEach((circle, index) => {
-      const angle = (index / total) * (2 * Math.PI);
-      const x = Math.cos(angle) * radius + container.clientWidth / 2 - circle.offsetWidth / 2;
-      const y = Math.sin(angle) * radius + container.clientHeight / 2 - circle.offsetHeight / 2;
-      circle.style.left = `${x}px`;
-      circle.style.top = `${y}px`;
+  // ✅ Redirect each circle to respective page
+  circles.forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      const stage = btn.innerText.trim().toLowerCase();
+
+      if (stage.includes("seed")) {
+        window.location.href = "seed_selection.html";
+      } 
+      else if (stage.includes("irrigation")) {
+        window.location.href = "irrigation.html";
+      } 
+      else if (stage.includes("next crop")) {
+        window.location.href = "next_crop.html";
+      } 
+      else {
+        alert(`Stage: ${btn.innerText.trim()} for ${selectedCrop}`);
+      }
     });
+  });
+</script>
 
-    // Optional: click alert
-    circles.forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.preventDefault();
-        alert(`Stage: ${btn.innerText} for ${selectedCrop}`);
-      });
-    });
-  </script>
+
 </body>
 </html>

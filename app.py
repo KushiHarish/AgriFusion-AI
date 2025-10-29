@@ -17,7 +17,7 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
-    required = ['N','P','K','temperature','humidity','ph','rainfall']
+    required = ['N','P','K','temperature','humidity','ph']
     if not data or any(k not in data for k in required):
         return jsonify({"error":"Missing one or more required fields", "required": required}), 400
 
@@ -29,7 +29,7 @@ def predict():
         'temperature': float(data['temperature']),
         'humidity': float(data['humidity']),
         'ph': float(data['ph']),
-        'rainfall': float(data['rainfall'])
+       # 'rainfall': float(data['rainfall'])
     }])
 
     try:

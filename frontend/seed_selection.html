@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seed Selection</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .content {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #f0f0f0;
+
+  /* ensure content sits above any background overlay */
+  position: relative;
+  z-index: 1;
+}
+
+    h2, h3 {
+      color: #dbf305;
+    }
+    ul {
+      text-align: left;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #388e3c;
+    }
+  </style>
+</head>
+<body class="login">
+  <div class="content">
+    <h2>🌱 Seed Selection</h2>
+    <p id="cropName"></p>
+
+    <h3>Recommended Seed Varieties</h3>
+    <ul id="seedVarieties">
+      <li>Loading recommendations...</li>
+    </ul>
+
+    <h3>Optimal Sowing Time</h3>
+    <p id="sowingTime">Depends on your crop.</p>
+
+    <h3>Seed Treatment</h3>
+    <p>Always use certified seeds. Treat seeds with fungicides or bio-agents before sowing for better resistance.</p>
+
+    <button onclick="window.location.href='stages.html'">⬅ Back to Stages</button>
+  </div>
+
+  <script>
+    const crop = localStorage.getItem("selectedCrop") || "your crop";
+    document.getElementById("cropName").innerText = `For crop: 🌾 ${crop}`;
+
+    const seedData = {
+      Maize: {
+        varieties: [
+          "Shaurya 9081: A single-cross hybrid suitable for both Kharif and Rabi, known for drought tolerance and high yield.",
+          "Shaurya 7011: Performs well in sandy and loamy soils and is disease-resistant.",
+          "CP 333: Hybrid with large kernels and high yields.",
+          "SX-201: 95–100 days in Kharif, 125–130 days in Rabi.",
+          "BRMH-1: Good for rain-fed areas.",
+          "BRMH-8: Semi-dent hybrid with high yield potential."
+        ],
+        time: "June–July (Kharif) or Oct–Nov (Rabi)"
+      },
+      Grapes: {
+        varieties: [
+          "Thompson Seedless: Common table and raisin variety.",
+          "Bangalore Blue: Excellent for wine.",
+          "Anab-e-Shahi: Large white seeded variety.",
+          "Perlette: High-yield seeded grape.",
+          "Gulabi: Aromatic and sweet.",
+          "Dilkhush: Pale green clone of Anab-e-Shahi."
+        ],
+        time: "December–January"
+      },
+      Orange: {
+        varieties: [
+          "Nagpur Santra: Sweet, rich color.",
+          "Kinnow: High juice content hybrid.",
+          "Coorg Orange: Popular southern variety."
+        ],
+        time: "July–August"
+      },
+      Potato: {
+        varieties: [
+          "Kufri Pukhraj: Early-maturing variety.",
+          "Kufri Sindhuri: Late-maturing, water-tolerant.",
+          "Kufri Jawahar: Medium-duration, blight-resistant.",
+          "Kufri Lalima: Fast-bulking red tuber.",
+          "Kufri Tejas: Heat-tolerant for processing.",
+          "Kufri Surya: For rainfed cultivation."
+        ],
+        time: "October–November"
+      },
+      Pepper: {
+        varieties: [
+          "Sagar Platinum F1: Resistant hybrid with dark fruits.",
+          "Mega Star (F1): High-yielding, large fruits.",
+          "Sania (F1): Vigorous, good shelf life.",
+          "Seminis Huntington: Disease-resistant with red fruits.",
+          "Celin and Intruder: Foliar disease-resistant.",
+          "California Wonder: Classic and popular."
+        ],
+        time: "June–July"
+      }
+    };
+
+    const data = seedData[crop] || { varieties: ["Data not available"], time: "N/A" };
+    document.getElementById("seedVarieties").innerHTML = data.varieties.map(v => `<li>${v}</li>`).join("");
+    document.getElementById("sowingTime").innerText = data.time;
+  </script>
+</body>
+</html>

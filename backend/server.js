@@ -9,10 +9,16 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ MongoDB Connection
-mongoose.connect("mongodb://127.0.0.1:27017/agrifusion_newDB")
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.log("❌ MongoDB connection error:", err));
+// ✅ MongoDB Atlas Connection
+mongoose.connect(
+  "mongodb+srv://meghana73kumar_db_user:eU0GytdkqM0BFg2G@cluster0.9qjhug7.mongodb.net/agrifusionDB?retryWrites=true&w=majority&appName=Cluster0",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+)
+.then(() => console.log("✅ MongoDB connected"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ User Schema
 const userSchema = new mongoose.Schema({
@@ -45,7 +51,7 @@ const User = mongoose.model("User", userSchema);
 
 // ✅ Soil Test Schema
 const soilTestSchema = new mongoose.Schema({
-  username: { type: String, required: true }, // link to farmer
+  username: { type: String, required: true },
   N: Number,
   P: Number,
   K: Number,
@@ -72,22 +78,19 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Username and password required" });
     }
 
-    // Check duplicate
     const exists = await User.findOne({ username });
     if (exists) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save new user
     const user = new User({
       username,
       password: hashedPassword,
       role: role || "farmer",
       fullName, age, phone, email, address,
-      land: land || {}
+      land: land || {},
     });
 
     await user.save();
@@ -126,7 +129,7 @@ app.post("/save-soiltest", async (req, res) => {
     }
 
     const test = new SoilTest({
-      username, N, P, K, temperature, humidity, ph, rainfall, predictedCrop
+      username, N, P, K, temperature, humidity, ph, rainfall, predictedCrop,
     });
     await test.save();
 
