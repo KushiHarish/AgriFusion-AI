@@ -1,0 +1,92 @@
+{
+  "Citrus_Canker_Diseases_Leaf_Orange": {
+    "type": "Bactericide",
+    "solution": "Spray copper oxychloride 0.3% or streptocycline 100 ppm at 10–15 day intervals.",
+    "organic": "Apply neem oil 3% or garlic extract spray every 15 days."
+  },
+  "Citrus_Nutrient_Deficiency_Yellow_Leaf_Orange": {
+    "type": "Fertilizer Management",
+    "solution": "Apply foliar spray of zinc sulfate 0.5% and ferrous sulfate 0.5% once every 20 days.",
+    "organic": "Use compost and banana peel solution for natural micronutrient enrichment."
+  },
+  "Corn_Blight": {
+    "type": "Fungicide",
+    "solution": "Use Mancozeb 75% WP at 2.5 g/L or Azoxystrobin 250 g/L at 0.5 L/ha during early infection.",
+    "organic": "Spray neem oil 2% or use garlic-chili extract as preventive measure."
+  },
+  "Corn_Common_Rust": {
+    "type": "Fungicide",
+    "solution": "Apply Propiconazole 25% EC 1 mL/L at first rust pustule appearance.",
+    "organic": "Spray sulphur dust or neem seed kernel extract (NSKE 5%) for rust suppression."
+  },
+  "Corn_grey_leaf_spot": {
+    "type": "Fungicide",
+    "solution": "Spray Tebuconazole 250 g/L at 0.5 L/ha at early lesion stage.",
+    "organic": "Use compost tea extract and maintain crop spacing for better air flow."
+  },
+  "Corn_healthy": {
+    "type": "None",
+    "solution": "Crop is healthy.",
+    "organic": "No treatment required."
+  },
+  "Grape_Black_Rot": {
+    "type": "Fungicide",
+    "solution": "Spray Mancozeb 2.5 g/L or Captan 0.2% at 10-day intervals during humid weather.",
+    "organic": "Use neem oil 3% or apply Trichoderma-enriched compost around vines."
+  },
+  "Grape_ESCA": {
+    "type": "Fungicide",
+    "solution": "Apply Carbendazim 50% WP at 1 g/L; prune infected canes immediately.",
+    "organic": "Apply Trichoderma viride paste to pruning wounds for natural disease suppression."
+  },
+  "Grape_Healthy": {
+    "type": "None",
+    "solution": "Crop is healthy.",
+    "organic": "No treatment required."
+  },
+  "Grape_Leaf_Blight": {
+    "type": "Fungicide",
+    "solution": "Spray Chlorothalonil 2 g/L or Copper oxychloride 0.3% twice at 10-day intervals.",
+    "organic": "Use neem oil 3% or turmeric water extract for natural protection."
+  },
+  "Healthy_Leaf_Orange": {
+    "type": "None",
+    "solution": "Crop is healthy.",
+    "organic": "No treatment required."
+  },
+  "Multiple_Diseases_Leaf_Orange": {
+    "type": "Integrated Control",
+    "solution": "Use Mancozeb 0.25% and copper oxychloride 0.3% alternately at 15-day intervals.",
+    "organic": "Spray neem oil 2% or fermented buttermilk solution for disease reduction."
+  },
+  "Pepper__bell___Bacterial_spot": {
+    "type": "Bactericide",
+    "solution": "Use copper-based sprays or kasugamycin formulations once every 10 days.",
+    "organic": "Apply neem oil or garlic extract for bacterial suppression."
+  },
+  "Pepper__bell___healthy": {
+    "type": "None",
+    "solution": "Crop is healthy.",
+    "organic": "No treatment required."
+  },
+  "Potato___Early_blight": {
+    "type": "Fungicide",
+    "solution": "Use Chlorothalonil 720 WG 0.75 kg/ha or Mancozeb 2.5 g/L every 10–12 days.",
+    "organic": "Spray compost tea or neem oil 3% for fungal control."
+  },
+  "Potato___Late_blight": {
+    "type": "Fungicide",
+    "solution": "Spray Metalaxyl 8% + Mancozeb 64% WP at 2 g/L when symptoms appear.",
+    "organic": "Use garlic extract spray and maintain dry leaves to prevent spread."
+  },
+  "Potato___healthy": {
+    "type": "None",
+    "solution": "Crop is healthy.",
+    "organic": "No treatment required."
+  },
+  "Young_Healthy_Leaf_Orange": {
+    "type": "None",
+    "solution": "Crop is healthy.",
+    "organic": "No treatment required."
+  }
+}
