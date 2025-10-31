@@ -1,0 +1,19 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Node.js
+node_modules/
+.env
+
+# Large files
+uploads/
+*.h5
+*.pkl
+*.zip
+
+# OS / IDE junk
+.DS_Store
+Thumbs.db
