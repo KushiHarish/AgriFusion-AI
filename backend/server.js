@@ -1,144 +1,311 @@
 // backend/server.js
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import bcrypt from "bcrypt";
-import bodyParser from "body-parser";
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const path = require("path");
 
 const app = express();
+app.use(express.json());
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ MongoDB Atlas Connection
-mongoose.connect(
-  "mongodb+srv://meghana73kumar_db_user:eU0GytdkqM0BFg2G@cluster0.9qjhug7.mongodb.net/agrifusionDB?retryWrites=true&w=majority&appName=Cluster0",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-)
-.then(() => console.log("✅ MongoDB connected"))
-.catch((err) => console.error("❌ MongoDB connection error:", err));
+// ======================
+// 🔗 MongoDB Connection
+// ======================
 
-// ✅ User Schema
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ["farmer", "admin", "customer"], default: "farmer" },
+mongoose
+  .connect(
+    "mongodb+srv://Agrifusion_2026:Ise_agrifusion@cluster0.2snwyyn.mongodb.net/?appName=Cluster0", // Replace this
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-  // personal details
-  fullName: String,
-  age: Number,
-  phone: String,
+// =========================================
+// 2️⃣ Farmer Schema
+// =========================================
+
+const farmerSchema = new mongoose.Schema({
+  username: String,
+  name: String,
   email: String,
+  phone: String,
+  age: String,
   address: String,
+  password: String,
 
-  // land details
-  land: {
-    climate: String,
-    size: Number,
-    units: String,
-    waterSource: String,
-    previousCrop: String,
+  cropChosen: String,
+
+  landDetails: {
     soilType: String,
-    irrigationPref: String,
+    landSize: String,
+    waterResource: String,
+    previousCrop: String,
+    irrigationPreference: String,
   },
 
-  createdAt: { type: Date, default: Date.now },
+  soilDetails: {
+    N: Number,
+    P: Number,
+    K: Number,
+    temperature: Number,
+    humidity: Number,
+    ph: Number,
+    moisture: Number,
+  },
+
+  status: { type: String, default: "active" },
 });
 
-const User = mongoose.model("User", userSchema);
+const Farmer = mongoose.model("Farmer", farmerSchema);
 
-// ✅ Soil Test Schema
-const soilTestSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  N: Number,
-  P: Number,
-  K: Number,
-  temperature: Number,
-  humidity: Number,
-  ph: Number,
-  rainfall: Number,
-  predictedCrop: String,
-  createdAt: { type: Date, default: Date.now }
-});
+// =========================================
+// 🌱 Soil Test History Schema
+// =========================================
+
+const soilTestSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true },
+    farmerId: { type: mongoose.Schema.Types.ObjectId, ref: "Farmer" },
+
+    N: { type: Number, required: true },
+    P: { type: Number, required: true },
+    K: { type: Number, required: true },
+    temperature: { type: Number, required: true },
+    humidity: { type: Number, required: true },
+    ph: { type: Number, required: true },
+    moisture: { type: Number, required: true },
+
+    testDate: { type: Date, default: Date.now },
+    notes: String,
+  },
+  { timestamps: true }
+);
 
 const SoilTest = mongoose.model("SoilTest", soilTestSchema);
 
-// ✅ Registration Route
+// ------------------------------
+// 👤 Registration Route
+// ------------------------------
 app.post("/register", async (req, res) => {
   try {
-    const {
-      username, password, role,
-      fullName, age, phone, email, address,
-      land
-    } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password required" });
-    }
-
-    const exists = await User.findOne({ username });
-    if (exists) {
-      return res.status(400).json({ message: "Username already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new User({
-      username,
-      password: hashedPassword,
-      role: role || "farmer",
-      fullName, age, phone, email, address,
-      land: land || {},
+    // Check if username already exists
+    const existingFarmer = await Farmer.findOne({
+      username: req.body.username,
     });
 
-    await user.save();
-    res.json({ message: "User registered successfully" });
+    if (existingFarmer) {
+      return res.status(400).json({
+        success: false,
+        message: "Username already exists",
+      });
+    }
+
+    const farmer = new Farmer(req.body);
+    await farmer.save();
+    res.json({ success: true, message: "Registration successful" });
   } catch (err) {
-    console.error("Register error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Error registering",
+      error: err.message,
+    });
   }
 });
-
-// ✅ Login Route
+// ------------------------------
+// 🔐 Login Route (Farmer + Admin)
+// ------------------------------
 app.post("/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ message: "User not found" });
+  console.log("Login attempt:", { username, password }); // Debug log
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ message: "Invalid password" });
-
-    res.json({ message: "Login successful", role: user.role });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+  // ADMIN LOGIN
+  if (username === "admin" && password === "123") {
+    return res.json({
+      role: "admin", // Changed from admin: true
+      username: "admin",
+      message: "Admin login successful",
+    });
   }
+
+  // FARMER LOGIN
+  const farmer = await Farmer.findOne({ username, password });
+
+  if (!farmer) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  res.json({
+    role: "farmer", // This is already correct
+    username: farmer.username,
+    message: "Farmer login successful",
+  });
 });
 
-// ✅ Save Soil Test Result Route
-app.post("/save-soiltest", async (req, res) => {
-  try {
-    const { username, N, P, K, temperature, humidity, ph, rainfall, predictedCrop } = req.body;
+// ------------------------------
+// 📌 Admin — Get All Farmers
+// ------------------------------
+app.get("/farmers", async (req, res) => {
+  const farmers = await Farmer.find();
+  res.json(farmers);
+});
 
-    if (!username || !predictedCrop) {
-      return res.status(400).json({ message: "Missing required fields" });
+// ------------------------------
+// ❌ Admin — Delete Farmer
+// ------------------------------
+app.delete("/farmer/:id", async (req, res) => {
+  await Farmer.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+});
+
+// ------------------------------
+// 🔄 Admin — Toggle Active/Inactive (MORE SPECIFIC - PUT THIS FIRST)
+// ------------------------------
+app.put("/farmer/status/:id", async (req, res) => {
+  const farmer = await Farmer.findById(req.params.id);
+  farmer.status = farmer.status === "active" ? "inactive" : "active";
+  await farmer.save();
+  res.json({ success: true });
+});
+
+// ------------------------------
+// ✏️ Update Farmer Profile (LESS SPECIFIC - PUT THIS SECOND)
+// ------------------------------
+app.put("/farmer/:id", async (req, res) => {
+  try {
+    const farmerId = req.params.id;
+    const updateData = req.body;
+
+    const updatedFarmer = await Farmer.findByIdAndUpdate(farmerId, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedFarmer) {
+      return res.status(404).json({
+        success: false,
+        message: "Farmer not found",
+      });
     }
 
-    const test = new SoilTest({
-      username, N, P, K, temperature, humidity, ph, rainfall, predictedCrop,
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      farmer: updatedFarmer,
     });
-    await test.save();
-
-    res.json({ message: "Soil test result saved successfully" });
   } catch (err) {
-    console.error("Error saving soil test:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      success: false,
+      message: "Error updating profile",
+      error: err.message,
+    });
   }
 });
 
-// ✅ Run Server
-app.listen(5001, () => console.log("✅ Server running on http://localhost:5001"));
+// ------------------------------
+// 🌱 Get Farmer's Soil Test History
+// ------------------------------
+app.get("/soil-tests/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    // Get farmer
+    const farmer = await Farmer.findOne({ username });
+    if (!farmer) {
+      return res.status(404).json({
+        success: false,
+        message: "Farmer not found",
+      });
+    }
+
+    // Get all soil tests for this farmer (sorted by date, newest first)
+    const soilTests = await SoilTest.find({ username }).sort({ testDate: -1 });
+
+    // Include registration soil data as first entry if no tests exist
+    const response = {
+      success: true,
+      registrationData: farmer.soilDetails,
+      testHistory: soilTests,
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching soil tests:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching soil tests",
+    });
+  }
+});
+
+// ------------------------------
+// 🌱 Save New Soil Test
+// ------------------------------
+app.post("/soil-test", async (req, res) => {
+  try {
+    const { username, N, P, K, temperature, humidity, ph, moisture, notes } =
+      req.body;
+
+    // Verify farmer exists
+    const farmer = await Farmer.findOne({ username });
+    if (!farmer) {
+      return res.status(404).json({
+        success: false,
+        message: "Farmer not found",
+      });
+    }
+
+    // Create new soil test
+    const soilTest = new SoilTest({
+      username,
+      farmerId: farmer._id,
+      N: parseFloat(N),
+      P: parseFloat(P),
+      K: parseFloat(K),
+      temperature: parseFloat(temperature),
+      humidity: parseFloat(humidity),
+      ph: parseFloat(ph),
+      moisture: parseFloat(moisture),
+      notes: notes || "",
+    });
+
+    await soilTest.save();
+
+    res.json({
+      success: true,
+      message: "Soil test saved successfully",
+      soilTest,
+    });
+  } catch (error) {
+    console.error("Error saving soil test:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error saving soil test",
+      error: error.message,
+    });
+  }
+});
+
+// ------------------------------
+// 🌱 Delete Soil Test
+// ------------------------------
+app.delete("/soil-test/:id", async (req, res) => {
+  try {
+    await SoilTest.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Soil test deleted" });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting soil test",
+    });
+  }
+});
+
+// ------------------------------
+app.listen(5000, () => {
+  console.log("🚀 Server running on port 5000");
+});

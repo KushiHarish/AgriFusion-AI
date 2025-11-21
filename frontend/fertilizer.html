@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fertilizer Recommendations - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(30, 60, 30, 0.85),
+            rgba(20, 40, 20, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1650&q=80")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
+
+      .header h1 {
+        color: #ffeb3b;
+        font-size: 28px;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 30px;
+      }
+
+      /* Crop Info Card */
+      .crop-info {
+        background: rgba(76, 175, 80, 0.2);
+        border: 2px solid #4caf50;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .crop-info h2 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        font-size: 24px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .info-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+      }
+
+      .info-item strong {
+        color: #ffd54f;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      /* Section */
+      .section {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .section h2 {
+        color: #ffd54f;
+        margin-bottom: 20px;
+        font-size: 26px;
+        border-bottom: 2px solid #ffeb3b;
+        padding-bottom: 10px;
+      }
+
+      /* Fertilizer Cards Grid */
+      .fertilizer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+        margin-top: 25px;
+      }
+
+      .fertilizer-card {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 25px;
+        border-radius: 15px;
+        border: 2px solid rgba(76, 175, 80, 0.3);
+        transition: all 0.3s;
+        position: relative;
+      }
+
+      .fertilizer-card.organic {
+        border-color: #4caf50;
+        background: rgba(76, 175, 80, 0.1);
+      }
+
+      .fertilizer-card.chemical {
+        border-color: #ff9800;
+        background: rgba(255, 152, 0, 0.1);
+      }
+
+      .fertilizer-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      .fertilizer-card.organic:hover {
+        border-color: #66bb6a;
+        box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5);
+      }
+
+      .fertilizer-card.chemical:hover {
+        border-color: #ffa726;
+        box-shadow: 0 12px 30px rgba(255, 152, 0, 0.5);
+      }
+
+      .fertilizer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .fertilizer-name {
+        font-size: 22px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .type-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      .type-badge.organic {
+        background: #4caf50;
+        color: white;
+      }
+
+      .type-badge.chemical {
+        background: #ff9800;
+        color: white;
+      }
+
+      .npk-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .npk-box {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      .npk-box .label {
+        font-size: 12px;
+        color: #ccc;
+        margin-bottom: 5px;
+      }
+
+      .npk-box .value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .npk-box .unit {
+        font-size: 11px;
+        color: #aaa;
+      }
+
+      .notes-box {
+        background: rgba(33, 150, 243, 0.15);
+        border-left: 3px solid #2196f3;
+        padding: 12px;
+        border-radius: 6px;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #e0e0e0;
+      }
+
+      .recommended-badge {
+        position: absolute;
+        top: -10px;
+        right: 20px;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+      }
+
+      .sustainability-banner {
+        background: linear-gradient(135deg, #4caf50, #66bb6a);
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      }
+
+      .sustainability-banner h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #fff;
+      }
+
+      .sustainability-banner p {
+        font-size: 16px;
+        color: #e8f5e9;
+      }
+
+      .tips-box {
+        background: rgba(255, 193, 7, 0.15);
+        border: 2px solid rgba(255, 193, 7, 0.4);
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 30px;
+      }
+
+      .tips-box h4 {
+        color: #ffc107;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .tips-box ul {
+        padding-left: 25px;
+        line-height: 2;
+        color: #e0e0e0;
+      }
+
+      /* Loading */
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #ffeb3b;
+        font-size: 18px;
+      }
+
+      .loading-spinner {
+        border: 4px solid rgba(255, 235, 59, 0.3);
+        border-top: 4px solid #ffeb3b;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        background: rgba(244, 67, 54, 0.2);
+        border: 2px solid #f44336;
+        padding: 25px;
+        border-radius: 10px;
+        color: #ffcdd2;
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .fertilizer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <a href="stages.html" class="back-btn">← Back to Stages</a>
+      <h1>🌱 Sustainable Fertilizer Recommendations</h1>
+      <div style="width: 120px"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Crop Information -->
+      <div class="crop-info" id="cropInfo">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          Loading your farm information...
+        </div>
+      </div>
+
+      <!-- Sustainability Banner -->
+      <div
+        class="sustainability-banner"
+        id="sustainabilityBanner"
+        style="display: none"
+      >
+        <h3>🌿 Prioritizing Sustainable Farming</h3>
+        <p>
+          We recommend organic fertilizers first to promote soil health and
+          environmental sustainability!
+        </p>
+      </div>
+      <div class="section" id="summarySection" style="display: none">
+        <h2>📋 Quick Summary</h2>
+        <div
+          id="summaryContent"
+          style="
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+          "
+        ></div>
+      </div>
+
+      <!-- Organic Options -->
+      <div class="section" id="organicSection" style="display: none">
+        <h2>🌿 Organic Fertilizer Options (Recommended)</h2>
+        <div id="organicGrid" class="fertilizer-grid"></div>
+      </div>
+
+      <!-- Chemical Options -->
+      <div class="section" id="chemicalSection" style="display: none">
+        <h2>⚗️ Chemical Fertilizer Alternatives</h2>
+        <p style="color: #ffc107; margin-bottom: 20px">
+          💡 Consider these if organic options are not available. Use
+          responsibly to minimize environmental impact.
+        </p>
+        <div id="chemicalGrid" class="fertilizer-grid"></div>
+      </div>
+
+      <!-- Application Tips -->
+      <div class="section" id="tipsSection" style="display: none">
+        <div class="tips-box">
+          <h4>💡 Best Practices for Fertilizer Application</h4>
+          <ul>
+            <li>
+              <strong>Organic First:</strong> Always prefer organic fertilizers
+              to improve soil health long-term
+            </li>
+            <li>
+              <strong>Timing:</strong> Apply during early morning or late
+              evening to reduce evaporation
+            </li>
+            <li>
+              <strong>Soil Moisture:</strong> Water the field lightly before
+              application for better absorption
+            </li>
+            <li>
+              <strong>Split Application:</strong> Divide total dose into 2-3
+              applications for better nutrient uptake
+            </li>
+            <li>
+              <strong>Mix Organic + Chemical:</strong> You can use both -
+              organic as base + chemical as supplement
+            </li>
+            <li>
+              <strong>Compost:</strong> Add compost along with any fertilizer
+              for better soil structure
+            </li>
+            <li>
+              <strong>Crop Rotation:</strong> Rotate crops to naturally restore
+              soil nutrients
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const username = localStorage.getItem("username");
+
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      let farmerData = null;
+
+      // Fetch farmer data and recommendations
+      async function loadRecommendations() {
+        try {
+          // Fetch farmer data
+          const farmersRes = await fetch("http://localhost:5000/farmers");
+          if (!farmersRes.ok) throw new Error("Failed to fetch farmer data");
+
+          const farmers = await farmersRes.json();
+          farmerData = farmers.find((f) => f.username === username);
+
+          if (!farmerData) {
+            throw new Error("Farmer not found");
+          }
+
+          // Display crop info
+          displayCropInfo(farmerData);
+
+          // Get fertilizer recommendations from Flask
+          await getFertilizerRecommendation(farmerData);
+        } catch (error) {
+          console.error("Error loading recommendations:", error);
+          document.getElementById("cropInfo").innerHTML = `
+                  <div class="error">
+                    <h3>❌ Error Loading Data</h3>
+                    <p>${error.message}</p>
+                    <p>Please make sure both Node.js (port 5000) and Flask (port 5001) servers are running.</p>
+                  </div>
+                `;
+        }
+      }
+
+      // Display crop information
+      function displayCropInfo(farmer) {
+        document.getElementById("cropInfo").innerHTML = `
+                <h2>🌾 Your Farm Details</h2>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <strong>Crop Selected</strong>
+                    ${farmer.cropChosen || "Not selected"}
+                  </div>
+                  <div class="info-item">
+                    <strong>Soil Type</strong>
+                    ${farmer.landDetails?.soilType || "N/A"}
+                  </div>
+                  <div class="info-item">
+                    <strong>Land Size</strong>
+                    ${farmer.landDetails?.landSize || "N/A"} acres
+                  </div>
+                  <div class="info-item">
+                    <strong>Nitrogen (N)</strong>
+                    ${farmer.soilDetails?.N || "N/A"} kg/ha
+                  </div>
+                  <div class="info-item">
+                    <strong>Phosphorus (P)</strong>
+                    ${farmer.soilDetails?.P || "N/A"} kg/ha
+                  </div>
+                  <div class="info-item">
+                    <strong>Potassium (K)</strong>
+                    ${farmer.soilDetails?.K || "N/A"} kg/ha
+                  </div>
+                </div>
+              `;
+      }
+
+      // Get fertilizer recommendation from Flask API
+      async function getFertilizerRecommendation(farmer) {
+        try {
+          const cropType = (farmer.cropChosen || "").toLowerCase();
+          const soilType = (
+            farmer.landDetails?.soilType || "loam"
+          ).toLowerCase();
+          const landSize = parseFloat(farmer.landDetails?.landSize) || 1;
+
+          const nitrogen = farmer.soilDetails?.N || 60;
+          const phosphorus = farmer.soilDetails?.P || 40;
+          const potassium = farmer.soilDetails?.K || 30;
+
+          console.log("Sending to Flask:", {
+            cropType,
+            soilType,
+            landSize,
+            nitrogen,
+            phosphorus,
+            potassium,
+          });
+
+          const response = await fetch(
+            `http://localhost:5001/get_fertilizer?` +
+              `crop=${encodeURIComponent(cropType)}` +
+              `&soil=${encodeURIComponent(soilType)}` +
+              `&landSize=${landSize}` +
+              `&landUnit=acres` +
+              `&nitrogen=${nitrogen}` +
+              `&phosphorus=${phosphorus}` +
+              `&potassium=${potassium}`
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(
+              errorData.error || `Flask API error: ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+          console.log("Flask response:", data);
+
+          displayFertilizerResults(data);
+        } catch (error) {
+          console.error("Error fetching fertilizer:", error);
+          document.getElementById("cropInfo").innerHTML += `
+                  <div class="error" style="margin-top: 20px;">
+                    <h3>❌ Unable to Get Fertilizer Recommendations</h3>
+                    <p>${error.message}</p>
+                  </div>
+                `;
+        }
+      }
+
+      // Display fertilizer results
+      function displayFertilizerResults(data) {
+        const hasOrganic =
+          data.organicOptions && data.organicOptions.length > 0;
+        const hasChemical =
+          data.chemicalOptions && data.chemicalOptions.length > 0;
+
+        // Show sustainability banner if organic options exist
+        if (hasOrganic) {
+          document.getElementById("sustainabilityBanner").style.display =
+            "block";
+          displaySummary(data);
+        }
+
+        // Display organic options
+        if (hasOrganic) {
+          document.getElementById("organicSection").style.display = "block";
+          const organicHTML = data.organicOptions
+            .map((fert, index) =>
+              createFertilizerCard(fert, "organic", index === 0)
+            )
+            .join("");
+          document.getElementById("organicGrid").innerHTML = organicHTML;
+        }
+
+        // Display chemical options
+        if (hasChemical) {
+          document.getElementById("chemicalSection").style.display = "block";
+          const chemicalHTML = data.chemicalOptions
+            .map((fert) => createFertilizerCard(fert, "chemical", false))
+            .join("");
+          document.getElementById("chemicalGrid").innerHTML = chemicalHTML;
+        }
+
+        // Show tips
+        document.getElementById("tipsSection").style.display = "block";
+      }
+
+      // Create fertilizer card HTML
+      // Create fertilizer card HTML
+      function createFertilizerCard(fert, type, isRecommended) {
+        return `
+          <div class="fertilizer-card ${type}">
+            ${
+              isRecommended
+                ? '<div class="recommended-badge">⭐ Best Choice</div>'
+                : ""
+            }
+            <div class="fertilizer-header">
+              <div class="fertilizer-name">${fert.name}</div>
+              <span class="type-badge ${type}">
+                ${type === "organic" ? "🌿 Organic" : "⚗️ Chemical"}
+              </span>
+            </div>
+
+            <div style="text-align: center; margin: 15px 0; padding: 12px; background: rgba(255, 235, 59, 0.2); border-radius: 8px;">
+              <div style="font-size: 14px; color: #ffd54f; margin-bottom: 5px;">
+                📦 Total Quantity Needed for Your ${
+                  farmerData.landDetails?.landSize || 0
+                } Acres
+              </div>
+            </div>
+
+            <div class="npk-grid">
+              <div class="npk-box">
+                <div class="label">Nitrogen (N)</div>
+                <div class="value">${fert.N}</div>
+                <div class="unit">kg total</div>
+              </div>
+              <div class="npk-box">
+                <div class="label">Phosphorus (P)</div>
+                <div class="value">${fert.P}</div>
+                <div class="unit">kg total</div>
+              </div>
+              <div class="npk-box">
+                <div class="label">Potassium (K)</div>
+                <div class="value">${fert.K}</div>
+                <div class="unit">kg total</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 12px; background: rgba(76, 175, 80, 0.15); border-radius: 8px; font-size: 14px; text-align: center;">
+              <strong style="color: #4caf50;">💰 Purchase Guide:</strong><br>
+              <span style="color: #e0e0e0;">
+                Buy approximately <strong style="color: #fff;">${
+                  Math.ceil((fert.N + fert.P + fert.K) / 50) * 50
+                } kg</strong>
+                of ${fert.name} for your entire field
+              </span>
+            </div>
+
+            ${
+              fert.notes
+                ? `
+              <div class="notes-box">
+                <strong>📝 Application Instructions:</strong><br>
+                ${fert.notes}
+              </div>
+            `
+                : ""
+            }
+          </div>
+        `;
+      }
+      // Display summary
+      function displaySummary(data) {
+        if (!data.organicOptions || data.organicOptions.length === 0) return;
+
+        const primary = data.organicOptions[0];
+        const totalNPK = primary.N + primary.P + primary.K;
+
+        document.getElementById("summarySection").style.display = "block";
+        document.getElementById("summaryContent").innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <div style="text-align: center;">
+        <div style="font-size: 48px; color: #4caf50; margin-bottom: 10px;">🌿</div>
+        <div style="font-size: 24px; font-weight: bold; color: #fff;">${
+          primary.name
+        }</div>
+        <div style="color: #4caf50; margin-top: 5px;">Recommended Organic Fertilizer</div>
+      </div>
+      
+      <div style="text-align: center;">
+        <div style="font-size: 48px; color: #ffeb3b; margin-bottom: 10px;">📦</div>
+        <div style="font-size: 32px; font-weight: bold; color: #fff;">${
+          Math.ceil(totalNPK / 50) * 50
+        } kg</div>
+        <div style="color: #ffd54f; margin-top: 5px;">Total to Purchase</div>
+      </div>
+      
+      <div style="text-align: center;">
+        <div style="font-size: 48px; color: #2196f3; margin-bottom: 10px;">🏞️</div>
+        <div style="font-size: 32px; font-weight: bold; color: #fff;">${
+          farmerData.landDetails?.landSize || 0
+        } Acres</div>
+        <div style="color: #64b5f6; margin-top: 5px;">Your Farm Size</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 25px; padding: 20px; background: rgba(76, 175, 80, 0.2); border-left: 4px solid #4caf50; border-radius: 8px;">
+      <strong style="color: #4caf50; font-size: 18px;">🛒 Shopping List:</strong>
+      <ul style="margin-top: 10px; color: #e0e0e0; line-height: 2;">
+        <li><strong>${Math.ceil(totalNPK / 50) * 50} kg</strong> of <strong>${
+          primary.name
+        }</strong></li>
+        <li>Or buy in smaller bags: <strong>${Math.ceil(
+          totalNPK / 50
+        )}</strong> bags of 50kg each</li>
+      </ul>
+    </div>
+  `;
+      }
+
+      // Load everything
+      loadRecommendations();
+    </script>
+  </body>
+</html>

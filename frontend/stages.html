@@ -1,179 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Crop Workflow - AgriFusion</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url("https://www.shutterstock.com/image-photo/farmer-rice-field-green-plant-600nw-1766373442.jpg") no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      overflow-x: hidden;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Growth Stages - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    .workflow-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 30px;
-      min-height: 100vh;
-    }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(20, 40, 20, 0.85),
+            rgba(10, 30, 10, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1582281298054-80526db63423?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: white;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
 
-    .side {
-      width: 25%;
-      background: rgba(0, 0, 0, 0.65);
-      padding: 15px;
-      border-radius: 12px;
-      overflow-y: auto;
-      max-height: 90vh;
-    }
+      /* Header with Back Button */
+      .header {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
 
-    h3 {
-      color: #ffd54f;
-      margin-top: 0;
-    }
+      .back-btn {
+        background: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+      }
 
-    ul {
-      list-style-type: square;
-      padding-left: 20px;
-    }
+      .back-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
 
-    /* Center Circle Container */
-    .circle-container {
-      position: relative;
-      width: 480px;
-      height: 480px;
-      margin: auto;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+      .header h1 {
+        color: #ffeb3b;
+        font-size: 28px;
+      }
 
-    .center {
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      background: rgba(0, 0, 0, 0.75);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      color: #ffeb3b;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-    }
+      .workflow-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 30px;
+        gap: 20px;
+      }
 
-    .circle {
-      position: absolute;
-      background: hsla(125, 77%, 49%, 0.25);
-      color: #ffeb3b;
-      width: 150px;
-      height: 100px;
-      text-align: center;
-      line-height: 50px;
-      border-radius: 25px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      font-weight: bold;
-      font-size: 17px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    }
+      .side {
+        width: 25%;
+        background: rgba(0, 0, 0, 0.75);
+        padding: 25px;
+        border-radius: 15px;
+        overflow-y: auto;
+        max-height: 80vh;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+      }
 
-    .circle:hover {
-      background: rgba(255, 255, 255, 0.4);
-      transform: scale(1.15);
-    }
-  </style>
-</head>
-<body>
-  <div class="workflow-container">
+      h3 {
+        color: #ffd54f;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        border-bottom: 2px solid #ffeb3b;
+        padding-bottom: 10px;
+      }
 
-    <!-- Left Side -->
-    <div class="side left">
-      <h3>Modern Methods</h3>
-      <ul>
-        <li><strong>Hydroponics:</strong> Soil-less farming using nutrient-rich water.</li>
-        <li><strong>Vertical Farming:</strong> Stacked indoor growing to save space and water.</li>
-        <li><strong>Smart Irrigation:</strong> Sensor-based watering for efficiency.</li>
-      </ul>
-    </div>
+      ul {
+        list-style-type: none;
+        padding: 0;
+        line-height: 2em;
+      }
 
-    <!-- Center Circle Section -->
-    <div class="circle-container" id="circleContainer">
-      <div class="center" id="cropName">🌾 Crop Name</div>
+      ul li {
+        margin-bottom: 15px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid #4caf50;
+      }
 
-      <!-- Circular Stages -->
-      <a href="#" class="circle" data-stage="seed">Seed Selection</a>
-      <a href="#" class="circle" data-stage="irrigation">Irrigation & Farming Methods</a>
-      <a href="#" class="circle" data-stage="disease">Disease Prediction</a> <!-- ✅ Fixed -->
-      <a href="#" class="circle" data-stage="pest">Pest Control</a>
-      <a href="#" class="circle" data-stage="harvest">Harvesting</a>
-      <a href="#" class="circle" data-stage="storage">Fertilizer Recommendation</a>
-      <a href="#" class="circle" data-stage="next">Next Crop</a>
-    </div>
+      ul li strong {
+        color: #4caf50;
+        display: block;
+        margin-bottom: 5px;
+      }
 
-    <!-- Right Side -->
-    <div class="side right">
-      <h3>Government Schemes</h3>
-      <ul>
-        <li><strong>PM-Kisan Yojana:</strong> ₹6,000 annual income support for small farmers.</li>
-        <li><strong>Soil Health Card:</strong> Tracks soil nutrients and guides fertilizer use.</li>
-      </ul>
-    </div>
-  </div>
+      .circle-container {
+        position: relative;
+        width: 550px;
+        height: 550px;
+        margin: 40px auto;
+      }
 
-  <script>
-    // ✅ Set crop name dynamically
-    const selectedCrop = localStorage.getItem("selectedCrop") || "Your Crop";
-    document.getElementById("cropName").innerText = `🌾 ${selectedCrop}`;
+      /* Center Crop Circle */
+      .center {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle at 30% 30%, #8bc34a, #33691e);
+        border: 4px solid rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        color: #fff;
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: glowPulse 2.5s infinite ease-in-out;
+        z-index: 10;
+      }
 
-    // ✅ Arrange circles in a circular pattern
-    const circles = document.querySelectorAll(".circle");
-    const container = document.getElementById("circleContainer");
-    const radius = 200;
-    const total = circles.length;
+      .center-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
 
-    circles.forEach((circle, index) => {
-      const angle = (index / total) * (2 * Math.PI);
-      const x = Math.cos(angle) * radius + container.clientWidth / 2 - circle.offsetWidth / 2;
-      const y = Math.sin(angle) * radius + container.clientHeight / 2 - circle.offsetHeight / 2;
-      circle.style.left = `${x}px`;
-      circle.style.top = `${y}px`;
-    });
-
-    // ✅ Redirect to appropriate pages
-    circles.forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.preventDefault();
-        const stage = btn.innerText.trim().toLowerCase();
-
-        if (stage.includes("seed")) {
-          window.location.href = "seed_selection.html";
-        } 
-        else if (stage.includes("irrigation")) {
-          window.location.href = "irrigation.html";
-        } 
-        else if (stage.includes("disease")) {
-          window.location.href = "disease.html"; // ✅ New addition
-        } 
-        else if (stage.includes("storage")) {
-          window.location.href = "fertiliser.html"; // optional
-        } 
-        else if (stage.includes("next crop")) {
-          window.location.href = "next_crop.html";
-        } 
-        else {
-          alert(`Stage: ${btn.innerText.trim()} for ${selectedCrop}`);
+      @keyframes glowPulse {
+        0% {
+          box-shadow: 0 0 25px rgba(76, 175, 80, 0.6),
+            0 0 50px rgba(129, 199, 132, 0.4);
         }
+        50% {
+          box-shadow: 0 0 45px rgba(255, 235, 59, 0.8),
+            0 0 70px rgba(255, 235, 59, 0.5);
+        }
+        100% {
+          box-shadow: 0 0 25px rgba(76, 175, 80, 0.6),
+            0 0 50px rgba(129, 199, 132, 0.4);
+        }
+      }
+
+      /* Stage Circles */
+      .circle {
+        position: absolute;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 193, 7, 0.3),
+          rgba(255, 152, 0, 0.3)
+        );
+        color: #fff;
+        width: 180px;
+        height: 70px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        border: 2px solid rgba(255, 235, 59, 0.5);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        padding: 10px;
+        line-height: 1.3em;
+        z-index: 5;
+      }
+
+      .circle:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 193, 7, 0.9),
+          rgba(255, 152, 0, 0.9)
+        );
+        color: #000;
+        transform: scale(1.15);
+        box-shadow: 0 6px 25px rgba(255, 193, 7, 0.9);
+        border-color: #ffeb3b;
+      }
+
+      svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      line {
+        stroke: rgba(255, 235, 59, 0.5);
+        stroke-width: 2;
+        transition: stroke 0.3s ease;
+      }
+
+      line.glow {
+        filter: drop-shadow(0 0 6px rgba(255, 235, 59, 0.6));
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: #ffeb3b;
+      }
+
+      @media (max-width: 1200px) {
+        .workflow-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .side {
+          width: 90%;
+          max-width: 600px;
+          margin-bottom: 20px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .circle-container {
+          width: 400px;
+          height: 400px;
+        }
+
+        .center {
+          width: 150px;
+          height: 150px;
+          font-size: 18px;
+        }
+
+        .center-icon {
+          font-size: 36px;
+        }
+
+        .circle {
+          width: 140px;
+          height: 60px;
+          font-size: 13px;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 15px;
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <a href="farmer.html" class="back-btn">← Back to Dashboard</a>
+      <h1>🌾 Crop Growth Lifecycle Management</h1>
+      <div style="width: 120px"></div>
+      <!-- Spacer for centering -->
+    </div>
+
+    <div class="workflow-container">
+      <!-- Left Panel: Modern Methods -->
+      <div class="side left">
+        <h3>🚀 Modern Farming Methods</h3>
+        <ul>
+          <li>
+            <strong>Hydroponics</strong>
+            Soil-less farming using nutrient-rich water solutions for faster
+            growth
+          </li>
+          <li>
+            <strong>Vertical Farming</strong>
+            Stacked indoor growing systems that save space & water
+          </li>
+          <li>
+            <strong>Smart Irrigation</strong>
+            Sensor-based automated watering for maximum efficiency
+          </li>
+          <li>
+            <strong>Precision Agriculture</strong>
+            Data-driven farming using IoT sensors and AI analytics
+          </li>
+          <li>
+            <strong>Drip Irrigation</strong>
+            Direct water delivery to roots, reducing waste by 60%
+          </li>
+        </ul>
+      </div>
+
+      <!-- Center: Crop Lifecycle Workflow -->
+      <div class="circle-container" id="circleContainer">
+        <svg id="connectorLines"></svg>
+
+        <div class="center" id="cropCenter">
+          <div class="loading">Loading...</div>
+        </div>
+
+        <a href="javascript:void(0)" class="circle" data-stage="irrigation">
+          💧 Irrigation<br />Planning
+        </a>
+        <a href="javascript:void(0)" class="circle" data-stage="fertilizer">
+          🌱 Fertilizer &<br />
+          Recommendation
+        </a>
+        <a href="javascript:void(0)" class="circle" data-stage="disease">
+          🦠 Disease<br />Detection
+        </a>
+        <a href="javascript:void(0)" class="circle" data-stage="harvesting">
+          🚜 Harvesting &<br />Storage
+        </a>
+        <a href="javascript:void(0)" class="circle" data-stage="cropRotation">
+          ♻️ Crop<br />Rotation
+        </a>
+      </div>
+
+      <!-- Right Panel: Government Schemes -->
+      <div class="side right">
+        <h3>🏛️ Government Schemes</h3>
+        <ul>
+          <li>
+            <strong>PM-Kisan Yojana</strong>
+            ₹6,000 annual direct income support for small & marginal farmers
+          </li>
+          <li>
+            <strong>Soil Health Card Scheme</strong>
+            Free soil testing and nutrient management guidance
+          </li>
+          <li>
+            <strong>Pradhan Mantri Fasal Bima Yojana</strong>
+            Crop insurance coverage against natural disasters
+          </li>
+          <li>
+            <strong>AgriTech & Innovation</strong>
+            Training programs and subsidies for modern farming equipment
+          </li>
+          <li>
+            <strong>Kisan Credit Card (KCC)</strong>
+            Easy access to short-term credit at subsidized interest rates
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      const username = localStorage.getItem("username");
+
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      let farmerData = null;
+
+      // Fetch farmer's crop data
+      async function loadFarmerCrop() {
+        try {
+          const res = await fetch("http://localhost:5000/farmers");
+          const farmers = await res.json();
+
+          farmerData = farmers.find((f) => f.username === username);
+
+          if (farmerData && farmerData.cropChosen) {
+            const cropCenter = document.getElementById("cropCenter");
+            cropCenter.innerHTML = `
+              <div class="center-icon">🌾</div>
+              <div>${farmerData.cropChosen}</div>
+            `;
+          } else {
+            const cropCenter = document.getElementById("cropCenter");
+            cropCenter.innerHTML = `
+              <div class="center-icon">🌾</div>
+              <div>No Crop<br>Selected</div>
+            `;
+          }
+        } catch (error) {
+          console.error("Error loading crop data:", error);
+          const cropCenter = document.getElementById("cropCenter");
+          cropCenter.innerHTML = `
+            <div class="center-icon">⚠️</div>
+            <div style="font-size: 14px;">Error Loading</div>
+          `;
+        }
+      }
+
+      // Position circles around center
+      const circles = document.querySelectorAll(".circle");
+      const container = document.getElementById("circleContainer");
+      const svg = document.getElementById("connectorLines");
+      const radius = 210;
+      const total = circles.length;
+
+      function positionCircles() {
+        const centerX = container.clientWidth / 2;
+        const centerY = container.clientHeight / 2;
+
+        circles.forEach((circle, index) => {
+          const angle = (index / total) * (2 * Math.PI) - Math.PI / 2;
+          const x = centerX + radius * Math.cos(angle) - circle.offsetWidth / 2;
+          const y =
+            centerY + radius * Math.sin(angle) - circle.offsetHeight / 2;
+
+          circle.style.left = `${x}px`;
+          circle.style.top = `${y}px`;
+
+          // Draw connecting lines
+          const line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+          );
+          line.setAttribute("x1", centerX);
+          line.setAttribute("y1", centerY);
+          line.setAttribute("x2", x + circle.offsetWidth / 2);
+          line.setAttribute("y2", y + circle.offsetHeight / 2);
+          line.classList.add("glow");
+          svg.appendChild(line);
+        });
+      }
+
+      // Handle stage navigation
+      circles.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const stage = btn.getAttribute("data-stage");
+
+          // Store current crop for other pages
+          if (farmerData && farmerData.cropChosen) {
+            localStorage.setItem("currentCrop", farmerData.cropChosen);
+          }
+
+          switch (stage) {
+            case "irrigation":
+              window.location.href = "irrigation.html";
+              break;
+            case "fertilizer":
+              window.location.href = "fertilizer.html";
+              break;
+            case "disease":
+              window.location.href = "disease.html";
+              break;
+            case "harvesting":
+              window.location.href = "harvesting.html";
+              break;
+            case "cropRotation":
+              window.location.href = "crop_rotation.html";
+              break;
+            default:
+              alert("⚠️ This feature is under development!");
+          }
+        });
       });
-    });
-  </script>
-</body>
+
+      // Initialize
+      loadFarmerCrop();
+      positionCircles();
+
+      // Reposition on window resize
+      window.addEventListener("resize", () => {
+        svg.innerHTML = "";
+        positionCircles();
+      });
+    </script>
+  </body>
 </html>

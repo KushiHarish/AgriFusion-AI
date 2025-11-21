@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Photo Gallery - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(30, 60, 30, 0.85),
+            rgba(20, 40, 20, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1650&q=80")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
+
+      .header h1 {
+        color: #ffeb3b;
+        font-size: 28px;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 30px;
+      }
+
+      /* Upload Section */
+      .upload-section {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .upload-section h2 {
+        color: #ffd54f;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+
+      .upload-form {
+        display: grid;
+        gap: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-group label {
+        color: #ffd54f;
+        font-weight: 600;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-wrapper input[type="file"] {
+        position: absolute;
+        left: -9999px;
+      }
+
+      .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px;
+        background: linear-gradient(135deg, #4caf50, #66bb6a);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: bold;
+      }
+
+      .file-input-label:hover {
+        background: linear-gradient(135deg, #66bb6a, #81c784);
+        transform: scale(1.02);
+      }
+
+      .file-name {
+        margin-top: 10px;
+        color: #4caf50;
+        font-size: 14px;
+      }
+
+      .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 12px;
+        margin-top: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .upload-btn {
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #2196f3, #42a5f5);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+      }
+
+      .upload-btn:hover {
+        background: linear-gradient(135deg, #42a5f5, #64b5f6);
+        transform: scale(1.05);
+      }
+
+      .upload-btn:disabled {
+        background: #757575;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Gallery Section */
+      .gallery-section {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 30px;
+        border-radius: 15px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .gallery-section h2 {
+        color: #ffd54f;
+        margin-bottom: 25px;
+        font-size: 24px;
+      }
+
+      .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+      }
+
+      .photo-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+      }
+
+      .photo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(255, 235, 59, 0.4);
+        border-color: #ffeb3b;
+      }
+
+      .photo-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        cursor: pointer;
+      }
+
+      .photo-info {
+        padding: 15px;
+      }
+
+      .photo-caption {
+        color: #fff;
+        font-size: 15px;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .photo-date {
+        color: #ffd54f;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+
+      .photo-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .delete-btn {
+        flex: 1;
+        padding: 8px;
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      .delete-btn:hover {
+        background: #d32f2f;
+      }
+
+      .view-btn {
+        flex: 1;
+        padding: 8px;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      .view-btn:hover {
+        background: #1976d2;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+        padding: 20px;
+      }
+
+      .modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+        margin: auto;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .modal-content img {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #ffeb3b;
+      }
+
+      .no-photos {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+      }
+
+      .no-photos-icon {
+        font-size: 64px;
+        margin-bottom: 15px;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .photos-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <a href="farmer.html" class="back-btn">← Back to Dashboard</a>
+      <h1>📸 Crop Photo Gallery</h1>
+      <div style="width: 120px"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <h2>📤 Upload New Photo</h2>
+        <form class="upload-form" id="uploadForm">
+          <div class="form-group">
+            <label>Select Photo *</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="photoInput" accept="image/*" required />
+              <label for="photoInput" class="file-input-label">
+                📷 Choose Image
+              </label>
+            </div>
+            <div class="file-name" id="fileName"></div>
+            <img
+              id="previewImage"
+              class="preview-image"
+              style="display: none"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="caption">Caption / Description</label>
+            <textarea
+              id="caption"
+              placeholder="e.g., Day 30 - Flowering stage, healthy growth"
+              maxlength="200"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="upload-btn" id="uploadBtn">
+            📤 Upload Photo
+          </button>
+        </form>
+      </div>
+
+      <!-- Gallery Section -->
+      <div class="gallery-section">
+        <h2>🖼️ Your Crop Timeline</h2>
+        <div class="photos-grid" id="photosGrid">
+          <div class="loading">Loading your photos...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="modal" id="imageModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">✕ Close</button>
+        <img id="modalImage" src="" alt="Full size" />
+      </div>
+    </div>
+
+    <script>
+      const username = localStorage.getItem("username");
+
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      const photoInput = document.getElementById("photoInput");
+      const fileName = document.getElementById("fileName");
+      const previewImage = document.getElementById("previewImage");
+      const uploadForm = document.getElementById("uploadForm");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const photosGrid = document.getElementById("photosGrid");
+
+      let selectedFile = null;
+
+      // File selection
+      photoInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          selectedFile = file;
+          fileName.textContent = `✅ Selected: ${file.name}`;
+
+          // Show preview
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            previewImage.src = e.target.result;
+            previewImage.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Upload photo (store in memory - simulated)
+      const photos = JSON.parse(
+        localStorage.getItem(`photos_${username}`) || "[]"
+      );
+
+      uploadForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!selectedFile) {
+          alert("Please select an image!");
+          return;
+        }
+
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = "⏳ Uploading...";
+
+        try {
+          // Convert image to base64 for storage
+          const reader = new FileReader();
+          reader.onload = () => {
+            const photoData = {
+              id: Date.now(),
+              url: reader.result,
+              caption: document.getElementById("caption").value || "Crop photo",
+              date: new Date().toISOString(),
+              username: username,
+            };
+
+            photos.push(photoData);
+            localStorage.setItem(`photos_${username}`, JSON.stringify(photos));
+
+            alert("✅ Photo uploaded successfully!");
+            uploadForm.reset();
+            fileName.textContent = "";
+            previewImage.style.display = "none";
+            selectedFile = null;
+
+            loadPhotos();
+          };
+          reader.readAsDataURL(selectedFile);
+        } catch (error) {
+          console.error("Error uploading photo:", error);
+          alert("❌ Failed to upload photo!");
+        } finally {
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = "📤 Upload Photo";
+        }
+      });
+
+      // Load photos
+      function loadPhotos() {
+        const storedPhotos = JSON.parse(
+          localStorage.getItem(`photos_${username}`) || "[]"
+        );
+
+        if (storedPhotos.length === 0) {
+          photosGrid.innerHTML = `
+            <div class="no-photos" style="grid-column: 1 / -1;">
+              <div class="no-photos-icon">📷</div>
+              <h3 style="color: #999;">No photos yet</h3>
+              <p style="color: #666; margin-top: 10px;">Upload your first crop photo to start your timeline!</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Sort by date (newest first)
+        storedPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        photosGrid.innerHTML = storedPhotos
+          .map(
+            (photo) => `
+          <div class="photo-card">
+            <img src="${photo.url}" alt="${
+              photo.caption
+            }" onclick="viewImage('${photo.url}')">
+            <div class="photo-info">
+              <div class="photo-caption">${photo.caption || "Crop photo"}</div>
+              <div class="photo-date">📅 ${formatDate(photo.date)}</div>
+              <div class="photo-actions">
+                <button class="view-btn" onclick="viewImage('${
+                  photo.url
+                }')">👁️ View</button>
+                <button class="delete-btn" onclick="deletePhoto(${
+                  photo.id
+                })">🗑️ Delete</button>
+              </div>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      // Format date
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-IN", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // View image in modal
+      function viewImage(url) {
+        document.getElementById("modalImage").src = url;
+        document.getElementById("imageModal").style.display = "block";
+      }
+
+      // Close modal
+      function closeModal() {
+        document.getElementById("imageModal").style.display = "none";
+      }
+
+      // Close modal on outside click
+      window.onclick = function (event) {
+        const modal = document.getElementById("imageModal");
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+
+      // Delete photo
+      function deletePhoto(photoId) {
+        if (!confirm("Are you sure you want to delete this photo?")) {
+          return;
+        }
+
+        const storedPhotos = JSON.parse(
+          localStorage.getItem(`photos_${username}`) || "[]"
+        );
+        const updatedPhotos = storedPhotos.filter((p) => p.id !== photoId);
+        localStorage.setItem(
+          `photos_${username}`,
+          JSON.stringify(updatedPhotos)
+        );
+
+        alert("✅ Photo deleted successfully!");
+        loadPhotos();
+      }
+
+      // Load photos on page load
+      loadPhotos();
+    </script>
+  </body>
+</html>

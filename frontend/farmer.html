@@ -1,32 +1,957 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Farmer Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>👨‍🌾 Welcome, Farmer!</h1>
-  <p>Here you can view soil reports, get crop recommendations, and monitor your farm activities.</p>
-  <button onclick="logout()">Logout</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Farmer Dashboard - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  <script>
-  // Simple access check
-  const role = localStorage.getItem("userRole");
-  if (role !== "farmer") {
-    alert("Access denied!");
-    window.location.href = "login.html";
-  }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(30, 60, 30, 0.85),
+            rgba(20, 40, 20, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1650&q=80")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
 
-  // Optional: auto-redirect farmer to soil test after a short delay
-  setTimeout(() => {
-    window.location.href = "frontend/soil_test.html";
-  }, 2000); // 2 seconds
+      /* Header Section */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = "login.html";
-  }
-</script>
-</body>
+      .header h1 {
+        font-size: 28px;
+        color: #ffeb3b;
+      }
+
+      .header-right {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .profile-btn,
+      .logout-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+        font-size: 14px;
+      }
+
+      .profile-btn {
+        background: #4caf50;
+        color: white;
+      }
+
+      .profile-btn:hover {
+        background: #45a049;
+        transform: scale(1.05);
+      }
+
+      .logout-btn {
+        background: #f44336;
+        color: white;
+      }
+
+      .logout-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
+
+      /* Welcome Section */
+      .welcome-section {
+        text-align: center;
+        padding: 40px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 20px;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .welcome-section h2 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: #ffeb3b;
+      }
+
+      .farmer-info {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 15px 25px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 235, 59, 0.3);
+        transition: all 0.3s;
+      }
+
+      .info-item:hover {
+        transform: translateY(-5px);
+        border-color: #ffeb3b;
+      }
+
+      .info-item strong {
+        color: #ffd54f;
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
+
+      .info-item span {
+        font-size: 16px;
+      }
+
+      /* Dashboard Container */
+      .dashboard-container {
+        padding: 30px;
+        min-height: calc(100vh - 300px);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 28px;
+        margin: 30px 0 20px;
+        color: #ffeb3b;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        transition: all 0.4s ease;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 235, 59, 0.1) 0%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card:hover {
+        transform: translateY(-15px) scale(1.03);
+        box-shadow: 0 15px 40px rgba(255, 235, 59, 0.4);
+        border-color: #ffeb3b;
+      }
+
+      .card-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+        display: block;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .card:hover .card-icon {
+        animation: none;
+        transform: scale(1.2);
+        transition: transform 0.3s;
+      }
+
+      .card h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #ffd54f;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card p {
+        font-size: 15px;
+        margin-bottom: 25px;
+        line-height: 1.6;
+        color: #e0e0e0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #ffeb3b, #ffc107);
+        color: #000;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: bold;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255, 235, 59, 0.4);
+        position: relative;
+        z-index: 1;
+      }
+
+      .btn:hover {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+      }
+
+      /* Profile Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        overflow-y: auto;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal-content {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        margin: 50px auto;
+        padding: 40px;
+        border-radius: 15px;
+        max-width: 700px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        color: white;
+        animation: slideDown 0.4s;
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #ffeb3b;
+        padding-bottom: 15px;
+      }
+
+      .modal-header h2 {
+        color: #ffeb3b;
+      }
+
+      .close-modal {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+      }
+
+      .close-modal:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
+
+      .profile-section {
+        margin-bottom: 25px;
+      }
+
+      .profile-section h3 {
+        color: #ffeb3b;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .profile-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 235, 59, 0.2);
+      }
+
+      .profile-item strong {
+        color: #ffd54f;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: #ffeb3b;
+        font-size: 16px;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        padding: 25px;
+        background: rgba(0, 0, 0, 0.6);
+        margin-top: 40px;
+        border-top: 2px solid rgba(255, 235, 59, 0.3);
+      }
+
+      .footer p {
+        margin: 5px 0;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 22px;
+        }
+
+        .dashboard-cards {
+          grid-template-columns: 1fr;
+          padding: 10px;
+        }
+
+        .farmer-info {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .welcome-section h2 {
+          font-size: 24px;
+        }
+
+        .card {
+          padding: 25px;
+        }
+
+        .modal-content {
+          margin: 20px;
+          padding: 25px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <h1>🌾 AgriFusion Dashboard</h1>
+      <div class="header-right">
+        <button class="profile-btn" onclick="openProfile()">
+          👤 My Profile
+        </button>
+        <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h2>Welcome back, <span id="usernameDisplay">Farmer</span>! 👋</h2>
+      <div class="farmer-info" id="farmerInfo">
+        <div class="loading">⏳ Loading your information...</div>
+      </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+      <h2 class="section-title">🌱 Your Farm Management Tools</h2>
+
+      <div class="dashboard-cards">
+        <!-- Soil Testing & Updates -->
+        <div class="card">
+          <div class="card-icon">🧪</div>
+          <h3>Soil Testing & Updates</h3>
+          <p>
+            View previous soil test results, update new soil data with dates,
+            and track changes over time for better crop planning.
+          </p>
+          <a href="soil_update.html" class="btn">Manage Soil Data</a>
+        </div>
+
+        <!-- Crop Growth Stages (Main Feature) -->
+        <div class="card">
+          <div class="card-icon">🌾</div>
+          <h3>Crop Growth Stages</h3>
+          <p>
+            Complete crop lifecycle management including irrigation, fertilizer,
+            disease detection, pesticides, harvesting, market info & crop
+            rotation.
+          </p>
+          <a href="stages.html" class="btn">View All Stages</a>
+        </div>
+
+        <!-- Upload Crop Photos -->
+        <div class="card">
+          <div class="card-icon">📸</div>
+          <h3>Crop Photo Gallery</h3>
+          <p>
+            Upload and organize regular photos to monitor your crop growth
+            progress and create a visual timeline.
+          </p>
+          <a href="crop_photos.html" class="btn">Upload Photos</a>
+        </div>
+
+        <!-- Balance Sheet -->
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Financial Balance Sheet</h3>
+          <p>
+            Track all your farming expenses, income, profits, and calculate
+            sustainability metrics for better financial planning.
+          </p>
+          <a href="balance_sheet.html" class="btn">View Finances</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>👨‍🌾 My Profile</h2>
+          <button class="close-modal" onclick="closeProfile()">✕ Close</button>
+        </div>
+        <div id="profileBody">
+          <div class="loading">⏳ Loading profile...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p style="font-size: 16px; font-weight: bold">
+        © 2024 AgriFusion - Smart Agriculture Assistance System
+      </p>
+      <p style="margin-top: 10px; font-size: 14px; color: #ffd54f">
+        Developed by: Kushi L H | Lekhana Bhat | Madhu N | Meghana K
+      </p>
+    </div>
+
+    <script>
+      let farmerData = null;
+      let isEditMode = false;
+
+      // Get username from localStorage
+      const username = localStorage.getItem("username");
+
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      // Fetch farmer data from backend
+      async function fetchFarmerData() {
+        try {
+          const res = await fetch("http://localhost:5000/farmers");
+
+          if (!res.ok) {
+            throw new Error("Failed to fetch data");
+          }
+
+          const farmers = await res.json();
+
+          // Find current farmer by username
+          farmerData = farmers.find((f) => f.username === username);
+
+          if (farmerData) {
+            displayFarmerInfo(farmerData);
+          } else {
+            document.getElementById("farmerInfo").innerHTML =
+              '<div style="color: #f44336;">⚠️ Farmer data not found!</div>';
+          }
+        } catch (error) {
+          console.error("Error fetching farmer data:", error);
+          document.getElementById("farmerInfo").innerHTML =
+            '<div style="color: #f44336;">❌ Failed to load data. Make sure server is running on port 5000!</div>';
+        }
+      }
+
+      // Display farmer info in welcome section
+      function displayFarmerInfo(farmer) {
+        document.getElementById("usernameDisplay").textContent =
+          farmer.name || farmer.username;
+
+        const farmerInfoDiv = document.getElementById("farmerInfo");
+        farmerInfoDiv.innerHTML = `
+              <div class="info-item">
+                <strong>🌾 Selected Crop</strong>
+                <span>${farmer.cropChosen || "Not selected"}</span>
+              </div>
+              <div class="info-item">
+                <strong>🏞️ Land Size</strong>
+                <span>${farmer.landDetails?.landSize || "N/A"} acres</span>
+              </div>
+              <div class="info-item">
+                <strong>🌱 Soil Type</strong>
+                <span>${farmer.landDetails?.soilType || "N/A"}</span>
+              </div>
+              <div class="info-item">
+                <strong>💧 Water Source</strong>
+                <span>${farmer.landDetails?.waterResource || "N/A"}</span>
+              </div>
+              <div class="info-item">
+                <strong>📊 Account Status</strong>
+                <span style="color: ${
+                  farmer.status === "active" ? "#4caf50" : "#f44336"
+                }; font-weight: bold;">
+                  ${(farmer.status || "active").toUpperCase()}
+                </span>
+              </div>
+            `;
+      }
+
+      // Open profile modal
+      function openProfile() {
+        if (!farmerData) {
+          alert("⏳ Please wait, loading your profile...");
+          return;
+        }
+
+        isEditMode = false;
+        displayProfileView();
+        document.getElementById("profileModal").style.display = "block";
+      }
+
+      // Display profile in view mode
+      function displayProfileView() {
+        const profileBody = document.getElementById("profileBody");
+        profileBody.innerHTML = `
+      <div style="text-align: right; margin-bottom: 20px;">
+        <button onclick="toggleEditMode()" style="background: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+          ✏️ Edit Profile
+        </button>
+      </div>
+
+      <div class="profile-section">
+        <h3>👤 Personal Information</h3>
+        <div class="profile-grid">
+          <div class="profile-item"><strong>Username:</strong> ${
+            farmerData.username || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Name:</strong> ${
+            farmerData.name || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Email:</strong> ${
+            farmerData.email || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Phone:</strong> ${
+            farmerData.phone || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Age:</strong> ${
+            farmerData.age || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Address:</strong> ${
+            farmerData.address || "N/A"
+          }</div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>🌾 Land Details</h3>
+        <div class="profile-grid">
+          <div class="profile-item"><strong>Soil Type:</strong> ${
+            farmerData.landDetails?.soilType || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Land Size:</strong> ${
+            farmerData.landDetails?.landSize || "N/A"
+          } acres</div>
+          <div class="profile-item"><strong>Water Resource:</strong> ${
+            farmerData.landDetails?.waterResource || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Previous Crop:</strong> ${
+            farmerData.landDetails?.previousCrop || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Irrigation:</strong> ${
+            farmerData.landDetails?.irrigationPreference || "N/A"
+          }</div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>🌱 Soil Test Data</h3>
+        <div class="profile-grid">
+          <div class="profile-item"><strong>Nitrogen (N):</strong> ${
+            farmerData.soilDetails?.N || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Phosphorus (P):</strong> ${
+            farmerData.soilDetails?.P || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Potassium (K):</strong> ${
+            farmerData.soilDetails?.K || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Temperature:</strong> ${
+            farmerData.soilDetails?.temperature || "N/A"
+          }°C</div>
+          <div class="profile-item"><strong>Humidity:</strong> ${
+            farmerData.soilDetails?.humidity || "N/A"
+          }%</div>
+          <div class="profile-item"><strong>pH:</strong> ${
+            farmerData.soilDetails?.ph || "N/A"
+          }</div>
+          <div class="profile-item"><strong>Moisture:</strong> ${
+            farmerData.soilDetails?.moisture || "N/A"
+          }%</div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>🌽 Crop Information</h3>
+        <div class="profile-grid">
+          <div class="profile-item"><strong>Crop Chosen:</strong> ${
+            farmerData.cropChosen || "Not selected"
+          }</div>
+          <div class="profile-item"><strong>Account Status:</strong> <span style="color: ${
+            farmerData.status === "active" ? "#4caf50" : "#f44336"
+          }; font-weight: bold;">${(
+          farmerData.status || "active"
+        ).toUpperCase()}</span></div>
+        </div>
+      </div>
+    `;
+      }
+
+      // Toggle edit mode
+      function toggleEditMode() {
+        isEditMode = !isEditMode;
+        if (isEditMode) {
+          displayEditForm();
+        } else {
+          displayProfileView();
+        }
+      }
+
+      // Display edit form
+      function displayEditForm() {
+        const profileBody = document.getElementById("profileBody");
+        profileBody.innerHTML = `
+      <div style="text-align: right; margin-bottom: 20px;">
+        <button onclick="toggleEditMode()" style="background: #757575; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+          ↩️ Cancel
+        </button>
+      </div>
+
+      <form id="editProfileForm" style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div class="profile-section">
+          <h3>👤 Personal Information</h3>
+          <div style="display: grid; gap: 15px;">
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Name:</label>
+              <input type="text" id="edit_name" value="${
+                farmerData.name || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Email:</label>
+              <input type="email" id="edit_email" value="${
+                farmerData.email || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Phone:</label>
+              <input type="text" id="edit_phone" value="${
+                farmerData.phone || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Age:</label>
+              <input type="number" id="edit_age" value="${
+                farmerData.age || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Address:</label>
+              <textarea id="edit_address" rows="2" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">${
+                  farmerData.address || ""
+                }</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>🌾 Land Details</h3>
+          <div style="display: grid; gap: 15px;">
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Soil Type:</label>
+              <select id="edit_soilType" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="Clay" ${
+                  farmerData.landDetails?.soilType === "Clay" ? "selected" : ""
+                }>Clay</option>
+                <option value="Loam" ${
+                  farmerData.landDetails?.soilType === "Loam" ? "selected" : ""
+                }>Loam</option>
+                <option value="Sandy" ${
+                  farmerData.landDetails?.soilType === "Sandy" ? "selected" : ""
+                }>Sandy</option>
+              </select>
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Land Size (acres):</label>
+              <input type="text" id="edit_landSize" value="${
+                farmerData.landDetails?.landSize || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Water Resource:</label>
+              <select id="edit_waterResource" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="River" ${
+                  farmerData.landDetails?.waterResource === "River"
+                    ? "selected"
+                    : ""
+                }>River</option>
+                <option value="Well" ${
+                  farmerData.landDetails?.waterResource === "Well"
+                    ? "selected"
+                    : ""
+                }>Well</option>
+                <option value="Tank Channels" ${
+                  farmerData.landDetails?.waterResource === "Tank Channels"
+                    ? "selected"
+                    : ""
+                }>Tank Channels</option>
+                <option value="Borewell" ${
+                  farmerData.landDetails?.waterResource === "Borewell"
+                    ? "selected"
+                    : ""
+                }>Borewell</option>
+              </select>
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Previous Crop:</label>
+              <input type="text" id="edit_previousCrop" value="${
+                farmerData.landDetails?.previousCrop || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div>
+              <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Irrigation Preference:</label>
+              <input type="text" id="edit_irrigationPreference" value="${
+                farmerData.landDetails?.irrigationPreference || ""
+              }" 
+                style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>🌽 Crop Information</h3>
+          <div>
+            <label style="color: #ffd54f; display: block; margin-bottom: 5px;">Crop Chosen:</label>
+            <select id="edit_cropChosen" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+              <option value="">-- Select Crop --</option>
+              <option value="Potato" ${
+                farmerData.cropChosen === "Potato" ? "selected" : ""
+              }>Potato</option>
+              <option value="Pepper" ${
+                farmerData.cropChosen === "Pepper" ? "selected" : ""
+              }>Pepper</option>
+              <option value="Maize" ${
+                farmerData.cropChosen === "Maize" ? "selected" : ""
+              }>Maize</option>
+              <option value="Orange" ${
+                farmerData.cropChosen === "Orange" ? "selected" : ""
+              }>Orange</option>
+              <option value="Grapes" ${
+                farmerData.cropChosen === "Grapes" ? "selected" : ""
+              }>Grapes</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+          <button type="submit" style="background: #4caf50; color: white; border: none; padding: 12px 40px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px;">
+            💾 Save Changes
+          </button>
+        </div>
+      </form>
+
+      <div id="updateMessage" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
+    `;
+
+        // Add form submit handler
+        document
+          .getElementById("editProfileForm")
+          .addEventListener("submit", saveProfile);
+      }
+
+      // Save profile changes
+      async function saveProfile(e) {
+        e.preventDefault();
+
+        const updateMessage = document.getElementById("updateMessage");
+        updateMessage.textContent = "⏳ Updating profile...";
+        updateMessage.style.color = "#ffeb3b";
+
+        const updatedData = {
+          name: document.getElementById("edit_name").value,
+          email: document.getElementById("edit_email").value,
+          phone: document.getElementById("edit_phone").value,
+          age: document.getElementById("edit_age").value,
+          address: document.getElementById("edit_address").value,
+
+          landDetails: {
+            soilType: document.getElementById("edit_soilType").value,
+            landSize: document.getElementById("edit_landSize").value,
+            waterResource: document.getElementById("edit_waterResource").value,
+            previousCrop: document.getElementById("edit_previousCrop").value,
+            irrigationPreference: document.getElementById(
+              "edit_irrigationPreference"
+            ).value,
+          },
+
+          cropChosen: document.getElementById("edit_cropChosen").value,
+        };
+
+        try {
+          const res = await fetch(
+            `http://localhost:5000/farmer/${farmerData._id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedData),
+            }
+          );
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            updateMessage.textContent = "✅ Profile updated successfully!";
+            updateMessage.style.color = "#4caf50";
+
+            // Update local farmer data
+            farmerData = data.farmer;
+
+            // Refresh the display
+            setTimeout(() => {
+              displayProfileView();
+              displayFarmerInfo(farmerData);
+            }, 1500);
+          } else {
+            updateMessage.textContent =
+              "❌ " + (data.message || "Failed to update profile");
+            updateMessage.style.color = "#f44336";
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          updateMessage.textContent = "❌ Server error! Please try again.";
+          updateMessage.style.color = "#f44336";
+        }
+      }
+
+      // Close profile modal
+      function closeProfile() {
+        document.getElementById("profileModal").style.display = "none";
+        isEditMode = false;
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function (event) {
+        const modal = document.getElementById("profileModal");
+        if (event.target === modal) {
+          closeProfile();
+        }
+      };
+
+      // Logout function
+      function logoutUser() {
+        if (confirm("⚠️ Are you sure you want to logout?")) {
+          localStorage.clear();
+          window.location.href = "login.html";
+        }
+      }
+
+      // Load farmer data on page load
+      fetchFarmerData();
+    </script>
+  </body>
 </html>

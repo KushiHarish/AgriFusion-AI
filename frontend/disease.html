@@ -1,194 +1,985 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Disease Prediction - AgriFusion</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
-      margin: 0;
-      padding: 40px;
-      text-align: center;
-      color: #333;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Disease Detection & Treatment - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    h2 {
-      color: #2e7d32;
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(30, 60, 30, 0.85),
+            rgba(20, 40, 20, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1650&q=80")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
 
-    p {
-      font-size: 15px;
-      color: #555;
-    }
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
 
-    .container {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      max-width: 550px;
-      margin: auto;
-    }
+      .back-btn {
+        background: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+      }
 
-    input[type="file"] {
-      margin: 10px 0;
-    }
+      .back-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
 
-    button {
-      background-color: #43a047;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+      .header h1 {
+        color: #ffeb3b;
+        font-size: 28px;
+      }
 
-    button:hover {
-      background-color: #388e3c;
-      transform: scale(1.05);
-    }
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+      }
 
-    img {
-      margin-top: 15px;
-      max-width: 250px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    }
+      /* Upload Section */
+      .upload-section {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 40px;
+        border-radius: 15px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        margin-bottom: 30px;
+      }
 
-    .result-box {
-      margin-top: 25px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-    }
+      .upload-section h2 {
+        color: #ffd54f;
+        margin-bottom: 15px;
+        font-size: 26px;
+      }
 
-    .solution-box {
-      display: none;
-      margin-top: 20px;
-      text-align: left;
-      background: #fafafa;
-      border-radius: 10px;
-      padding: 15px 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+      .upload-section p {
+        color: #e0e0e0;
+        margin-bottom: 25px;
+        font-size: 16px;
+      }
 
-    .chemical {
-      background: #ffebee;
-      padding: 10px;
-      border-radius: 8px;
-      color: #b71c1c;
-      margin-bottom: 10px;
-    }
+      .upload-area {
+        border: 3px dashed rgba(255, 235, 59, 0.4);
+        border-radius: 12px;
+        padding: 40px;
+        margin: 20px 0;
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.3s;
+      }
 
-    .organic {
-      background: #e8f5e9;
-      padding: 10px;
-      border-radius: 8px;
-      color: #1b5e20;
-    }
+      .upload-area:hover {
+        border-color: #ffeb3b;
+        background: rgba(255, 255, 255, 0.08);
+      }
 
-    .back-btn {
-      background: #1b5e20;
-      color: white;
-      margin-top: 25px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>🌿 Plant Disease Prediction</h2>
-    <p>Upload a leaf image (jpg/png) — the app will predict the disease using AI.</p>
+      .upload-area.dragover {
+        border-color: #4caf50;
+        background: rgba(76, 175, 80, 0.1);
+      }
 
-    <input type="file" id="fileInput" accept="image/*"><br>
-    <button id="predictBtn">Predict</button>
+      input[type="file"] {
+        display: none;
+      }
 
-    <div id="preview"></div>
-    <div class="result-box" id="result"></div>
+      .upload-btn {
+        background: linear-gradient(135deg, #4caf50, #66bb6a);
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+      }
 
-    <!-- Solution Section (hidden by default) -->
-    <div class="solution-box" id="solutionBox">
-      <h3 style="text-align:center; color:#2e7d32;">Recommended Solutions</h3>
-      <div class="chemical" id="chemicalSol"></div>
-      <div class="organic" id="organicSol"></div>
-      
+      .upload-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+      }
+
+      .predict-btn {
+        background: linear-gradient(135deg, #2196f3, #42a5f5);
+        color: white;
+        padding: 15px 50px;
+        border: none;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+        margin-top: 20px;
+      }
+
+      .predict-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+      }
+
+      .predict-btn:disabled {
+        background: #757575;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Image Preview */
+      .preview-container {
+        margin: 25px 0;
+      }
+
+      .preview-container img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        border: 3px solid rgba(255, 235, 59, 0.3);
+      }
+
+      /* Results Section */
+      .results-section {
+        display: none;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 30px;
+        border-radius: 15px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        margin-bottom: 30px;
+      }
+
+      .disease-result {
+        text-align: center;
+        padding: 30px;
+        background: rgba(244, 67, 54, 0.15);
+        border: 2px solid #f44336;
+        border-radius: 12px;
+        margin-bottom: 30px;
+      }
+
+      .disease-result.healthy {
+        background: rgba(76, 175, 80, 0.15);
+        border-color: #4caf50;
+      }
+
+      .disease-result h3 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: #fff;
+      }
+
+      .disease-name {
+        font-size: 24px;
+        color: #ffeb3b;
+        font-weight: bold;
+      }
+
+      /* Treatment Section */
+      .treatment-section {
+        margin-top: 30px;
+      }
+
+      .treatment-section h3 {
+        color: #ffd54f;
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ffeb3b;
+        padding-bottom: 10px;
+      }
+
+      .treatment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .treatment-card {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 25px;
+        border-radius: 12px;
+        border-left: 4px solid #4caf50;
+      }
+
+      .treatment-card h4 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .treatment-card p {
+        color: #e0e0e0;
+        line-height: 1.8;
+        margin: 10px 0;
+      }
+
+      .treatment-type {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .treatment-type.organic {
+        background: #4caf50;
+        color: white;
+      }
+
+      .treatment-type.chemical {
+        background: #ff9800;
+        color: white;
+      }
+
+      /* Pesticide Recommendations */
+      .pesticide-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .pesticide-card {
+        background: rgba(255, 193, 7, 0.1);
+        border: 2px solid rgba(255, 193, 7, 0.3);
+        padding: 20px;
+        border-radius: 12px;
+        transition: all 0.3s;
+      }
+
+      .pesticide-card:hover {
+        transform: translateY(-5px);
+        border-color: #ffc107;
+        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+      }
+
+      .pesticide-card h4 {
+        color: #ffc107;
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+
+      /* Loading */
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #ffeb3b;
+      }
+
+      .loading-spinner {
+        border: 4px solid rgba(255, 235, 59, 0.3);
+        border-top: 4px solid #ffeb3b;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        background: rgba(244, 67, 54, 0.2);
+        border: 2px solid #f44336;
+        padding: 20px;
+        border-radius: 10px;
+        color: #ffcdd2;
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .safety-warning {
+        background: rgba(255, 152, 0, 0.15);
+        border: 2px solid #ff9800;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 25px;
+      }
+
+      .safety-warning h4 {
+        color: #ff9800;
+        margin-bottom: 15px;
+      }
+
+      .safety-warning ul {
+        padding-left: 25px;
+        color: #e0e0e0;
+        line-height: 2;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .treatment-grid,
+        .pesticide-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <a href="stages.html" class="back-btn">← Back to Stages</a>
+      <h1>🦠 Disease Detection & Treatment</h1>
+      <div style="width: 120px"></div>
     </div>
 
-    <button class="back-btn" onclick="window.location.href='stages.html'">⬅ Back to Workflow</button>
-  </div>
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <h2>📸 Upload Crop Leaf Image</h2>
+        <p>
+          Upload a clear image of your crop leaf for AI-powered disease
+          detection
+        </p>
 
-  <script>
-  const fileInput = document.getElementById("fileInput");
-  const preview = document.getElementById("preview");
-  const result = document.getElementById("result");
-  const solutionBox = document.getElementById("solutionBox");
-  const chemicalSol = document.getElementById("chemicalSol");
-  const organicSol = document.getElementById("organicSol");
+        <div class="upload-area" id="uploadArea">
+          <div style="font-size: 64px; margin-bottom: 15px">🌿</div>
+          <p style="font-size: 18px; margin-bottom: 20px">
+            Click to browse or drag & drop your image here
+          </p>
+          <input type="file" id="fileInput" accept="image/*" />
+          <button
+            class="upload-btn"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            📂 Choose Image
+          </button>
+        </div>
 
-  // ✅ Simple image preview (no validation filter)
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    preview.innerHTML = "";
-    preview.appendChild(img);
-    result.innerHTML = "";
-    solutionBox.style.display = "none";
-  });
+        <div
+          class="preview-container"
+          id="previewContainer"
+          style="display: none"
+        >
+          <img id="previewImage" alt="Preview" />
+        </div>
 
-  // ✅ Predict button
-  document.getElementById("predictBtn").addEventListener("click", async () => {
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Please upload a leaf image!");
-      return;
-    }
+        <button class="predict-btn" id="predictBtn" disabled>
+          🔍 Detect Disease
+        </button>
+      </div>
 
-    const formData = new FormData();
-    formData.append("image", file);
+      <!-- Results Section -->
+      <div class="results-section" id="resultsSection">
+        <div id="resultsContent"></div>
+      </div>
+    </div>
 
-    result.innerHTML = "🔍 Analyzing image... Please wait...";
-    solutionBox.style.display = "none";
+    <script>
+      const username = localStorage.getItem("username");
 
-    try {
-      const res = await fetch("http://127.0.0.1:5000/predict_disease", {
-        method: "POST",
-        body: formData
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      let farmerData = null;
+      let farmerCrop = null;
+
+      const fileInput = document.getElementById("fileInput");
+      const uploadArea = document.getElementById("uploadArea");
+      const previewContainer = document.getElementById("previewContainer");
+      const previewImage = document.getElementById("previewImage");
+      const predictBtn = document.getElementById("predictBtn");
+      const resultsSection = document.getElementById("resultsSection");
+
+      let selectedFile = null;
+
+      // Fetch farmer's crop first
+      async function loadFarmerCrop() {
+        try {
+          const res = await fetch("http://localhost:5000/farmers");
+          const farmers = await res.json();
+          farmerData = farmers.find((f) => f.username === username);
+
+          if (!farmerData) {
+            alert("❌ Farmer data not found!");
+            window.location.href = "farmer.html";
+            return;
+          }
+
+          farmerCrop = farmerData.cropChosen;
+
+          if (!farmerCrop) {
+            alert(
+              "⚠️ You haven't selected a crop yet! Please update your profile."
+            );
+            window.location.href = "farmer.html";
+            return;
+          }
+
+          console.log("✅ Farmer's selected crop:", farmerCrop);
+          showCropInfo();
+        } catch (error) {
+          console.error("Error loading farmer data:", error);
+          alert("❌ Failed to load your crop information!");
+        }
+      }
+
+      // Show crop information banner
+      function showCropInfo() {
+        const banner = document.querySelector(".upload-section h2");
+        banner.innerHTML = `📸 Upload ${farmerCrop} Leaf Image`;
+
+        const description = document.querySelector(".upload-section p");
+        description.innerHTML = `Upload a clear image of your <strong>${farmerCrop}</strong> leaf for AI-powered disease detection. <br><span style="color: #ff9800; font-size: 14px; margin-top: 10px; display: block;">⚠️ Only ${farmerCrop} leaf images will be accepted!</span>`;
+      }
+
+      // File input change
+      fileInput.addEventListener("change", handleFileSelect);
+
+      function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          selectedFile = file;
+          displayPreview(file);
+          predictBtn.disabled = false;
+        }
+      }
+
+      // Drag and drop
+      uploadArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadArea.classList.add("dragover");
       });
 
-      const data = await res.json();
-      if (data.error) {
-        result.innerHTML = `<span style='color:red;'>❌ ${data.error}</span>`;
-        return;
+      uploadArea.addEventListener("dragleave", () => {
+        uploadArea.classList.remove("dragover");
+      });
+
+      uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove("dragover");
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) {
+          selectedFile = file;
+          fileInput.files = e.dataTransfer.files;
+          displayPreview(file);
+          predictBtn.disabled = false;
+        }
+      });
+
+      // Display preview
+      function displayPreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImage.src = e.target.result;
+          previewContainer.style.display = "block";
+          resultsSection.style.display = "none";
+        };
+        reader.readAsDataURL(file);
       }
 
-      result.innerHTML = `🌿 <strong>Prediction:</strong> ${data.prediction}`;
+      // Predict disease
+      predictBtn.addEventListener("click", async () => {
+        if (!selectedFile) {
+          alert("Please select an image first!");
+          return;
+        }
 
-      if (data.solution === null || data.healthy) {
-        result.innerHTML += `<br><br>✅ The plant appears healthy! No treatment needed.`;
-        return;
+        if (!farmerCrop) {
+          alert("❌ Crop information not loaded. Please refresh the page.");
+          return;
+        }
+
+        resultsSection.style.display = "block";
+        resultsSection.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p style="font-size: 18px;">🔬 Analyzing ${farmerCrop} leaf image with AI...</p>
+      <p style="color: #ccc; margin-top: 10px;">This may take a few seconds</p>
+    </div>
+  `;
+
+        predictBtn.disabled = true;
+
+        try {
+          const formData = new FormData();
+          formData.append("image", selectedFile);
+
+          const response = await fetch(
+            "http://localhost:5001/predict_disease",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          console.log("Flask API Response:", data);
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          // ✅ VALIDATE IF PREDICTED CROP MATCHES FARMER'S CROP
+          const predictedDisease = data.prediction || "Unknown";
+
+          console.log("Predicted Disease:", predictedDisease);
+          console.log("Farmer's Crop:", farmerCrop);
+
+          // Extract crop from disease prediction
+          const predictedCrop = extractCropFromPrediction(predictedDisease);
+
+          console.log("Extracted Crop from Prediction:", predictedCrop);
+
+          // Normalize crop names for comparison
+          const normalizedFarmerCrop = normalizeCropName(farmerCrop);
+          const normalizedPredictedCrop = normalizeCropName(predictedCrop);
+
+          console.log("Normalized Farmer Crop:", normalizedFarmerCrop);
+          console.log("Normalized Predicted Crop:", normalizedPredictedCrop);
+
+          // Check if predicted crop matches farmer's crop
+          if (
+            normalizedPredictedCrop &&
+            normalizedPredictedCrop !== normalizedFarmerCrop
+          ) {
+            resultsSection.innerHTML = `
+        <div class="error">
+          <h3>❌ Wrong Crop Detected!</h3>
+          <p style="margin-top: 15px; line-height: 1.8;">
+            The AI detected this as <strong>${predictedCrop}</strong> disease, 
+            but you are growing <strong>${farmerCrop}</strong>.
+          </p>
+          <p style="margin-top: 15px; color: #ffeb3b;">
+            ⚠️ This might be due to:
+          </p>
+          <ul style="text-align: left; padding-left: 40px; color: #e0e0e0; line-height: 2; margin-top: 10px;">
+            <li>Wrong crop image uploaded</li>
+            <li>Poor image quality or lighting</li>
+            <li>Model uncertainty (similar symptoms across crops)</li>
+          </ul>
+          
+          <div style="margin-top: 25px; padding: 20px; background: rgba(255, 152, 0, 0.1); border: 2px solid #ff9800; border-radius: 10px;">
+            <h4 style="color: #ff9800; margin-bottom: 10px;">📸 Tips for Better Detection:</h4>
+            <ul style="text-align: left; padding-left: 20px; color: #e0e0e0; line-height: 2;">
+              <li>Ensure the image is of ${farmerCrop} leaves</li>
+              <li>Take a clear, well-lit photo</li>
+              <li>Focus on the diseased area of the leaf</li>
+              <li>Avoid blurry or dark images</li>
+              <li>Use a plain background if possible</li>
+            </ul>
+          </div>
+
+          <div style="margin-top: 25px; text-align: center; padding: 20px; background: rgba(33, 150, 243, 0.1); border: 2px solid #2196f3; border-radius: 10px;">
+            <p style="color: #64b5f6; margin-bottom: 15px; font-size: 15px;">
+              💡 <strong>Testing Mode:</strong> Want to see what the AI detected anyway?
+            </p>
+            <button 
+              onclick='displayResults(${JSON.stringify(data).replace(
+                /'/g,
+                "\\'"
+              )})'
+              style="padding: 12px 30px; background: linear-gradient(135deg, #2196f3, #1976d2); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px; transition: all 0.3s;"
+              onmouseover="this.style.transform='scale(1.05)'"
+              onmouseout="this.style.transform='scale(1)'"
+            >
+              🔬 Show AI Prediction (Override)
+            </button>
+          </div>
+        </div>
+      `;
+            predictBtn.disabled = false;
+            return;
+          }
+
+          // ✅ If validation passes, show results
+          displayResults(data);
+        } catch (error) {
+          console.error("Error:", error);
+          resultsSection.innerHTML = `
+      <div class="error">
+        <h3>❌ Disease Detection Failed</h3>
+        <p>${error.message}</p>
+        <p style="margin-top: 15px;"><strong>Troubleshooting:</strong></p>
+        <ul style="text-align: left; padding-left: 20px; margin-top: 10px;">
+          <li>Make sure Flask server is running on port 5001</li>
+          <li>Verify disease model files exist</li>
+          <li>Check image format (JPG, PNG supported)</li>
+          <li>Ensure you uploaded a ${farmerCrop} leaf image</li>
+          <li>Check browser console (F12) for details</li>
+        </ul>
+      </div>
+    `;
+        } finally {
+          predictBtn.disabled = false;
+        }
+      });
+
+      // Extract crop name from disease prediction (handles both ___ and _ formats)
+      function extractCropFromPrediction(prediction) {
+        if (!prediction) return null;
+
+        // Handle different formats:
+        // "Potato___Early_blight" -> "Potato"
+        // "Corn_Common_Rust" -> "Corn"
+        // "Pepper__bell___healthy" -> "Pepper__bell"
+
+        let cropName;
+
+        // First try triple underscore (standard PlantVillage format)
+        if (prediction.includes("___")) {
+          cropName = prediction.split("___")[0];
+        }
+        // Then try double underscore (like Pepper__bell)
+        else if (prediction.includes("__")) {
+          // For Pepper__bell___healthy, get "Pepper__bell"
+          const parts = prediction.split("___");
+          if (parts.length > 1) {
+            cropName = parts[0];
+          } else {
+            // For cases like Pepper__bell_something
+            cropName = prediction.split("_").slice(0, 2).join("_");
+          }
+        }
+        // Finally single underscore (custom format)
+        else if (prediction.includes("_")) {
+          // Get first part before underscore
+          cropName = prediction.split("_")[0];
+        }
+        // No underscore (like "Healthy_Leaf_Orange" where whole thing is crop)
+        else {
+          cropName = prediction;
+        }
+
+        return cropName ? cropName.trim() : null;
       }
 
-      const btn = document.createElement("button");
-      btn.textContent = "💡 View Solution";
-      btn.onclick = () => {
-        chemicalSol.innerHTML = `<b>Chemical:</b> ${data.solution.type} — ${data.solution.solution}`;
-        organicSol.innerHTML = `<b>Organic:</b> ${data.solution.organic}`;
-        solutionBox.style.display = "block";
-        btn.remove();
-      };
-      result.appendChild(document.createElement("br"));
-      result.appendChild(btn);
+      // Normalize crop names for comparison
+      function normalizeCropName(cropName) {
+        if (!cropName) return null;
 
-    } catch (err) {
-      result.innerHTML = `<span style='color:red;'>⚠️ ${err.message}</span>`;
-    }
-  });
-  </script>
-</body>
+        const normalized = cropName.toLowerCase().trim();
+
+        // Handle variations and mappings
+        const mappings = {
+          // Tomato variations
+          tomato: "tomato",
+
+          // Potato variations
+          potato: "potato",
+
+          // Pepper variations
+          pepper: "pepper",
+          pepper__bell: "pepper",
+          bell_pepper: "pepper",
+          bellpepper: "pepper",
+          "bell pepper": "pepper",
+
+          // Corn/Maize variations
+          corn: "maize",
+          maize: "maize",
+          corn_blight: "maize",
+          corn_common_rust: "maize",
+          corn_grey_leaf_spot: "maize",
+          corn_healthy: "maize",
+
+          // Rice variations
+          rice: "rice",
+
+          // Wheat variations
+          wheat: "wheat",
+
+          // Orange variations
+          orange: "orange",
+          citrus_canker_diseases_leaf_orange: "orange",
+          citrus_nutrient_deficiency_yellow_leaf_orange: "orange",
+          healthy_leaf_orange: "orange",
+          multiple_diseases_leaf_orange: "orange",
+          young_healthy_leaf_orange: "orange",
+
+          // Grape variations
+          grape: "grapes",
+          grapes: "grapes",
+          grape_black_rot: "grapes",
+          grape_esca: "grapes",
+          grape_healthy: "grapes",
+          grape_leaf_blight: "grapes",
+
+          // Apple variations
+          apple: "apple",
+
+          // Cherry variations
+          cherry: "cherry",
+
+          // Peach variations
+          peach: "peach",
+
+          // Strawberry variations
+          strawberry: "strawberry",
+        };
+
+        return mappings[normalized] || normalized;
+      }
+
+      // Display results (keep existing function)
+      function displayResults(data) {
+        const diseaseName = data.prediction || "Unknown";
+        const isHealthy = diseaseName.toLowerCase().includes("healthy");
+        const solution = data.solution || {};
+
+        let html = `
+    <div class="disease-result ${isHealthy ? "healthy" : ""}">
+      <h3>${isHealthy ? "✅ Good News!" : "⚠️ Disease Detected"}</h3>
+      <div class="disease-name">${diseaseName
+        .replace(/___/g, " - ")
+        .replace(/_/g, " ")}</div>
+      <p style="color: #c8e6c9; margin-top: 10px; font-size: 14px;">✓ Verified as ${farmerCrop} crop</p>
+    </div>
+  `;
+
+        if (!isHealthy && solution) {
+          html += `
+      <div class="treatment-section">
+        <h3>💊 Recommended Treatments</h3>
+        <div class="treatment-grid">
+          ${
+            solution.solution
+              ? `
+            <div class="treatment-card">
+              <span class="treatment-type chemical">⚗️ Chemical Treatment</span>
+              <h4>Primary Solution</h4>
+              <p>${solution.solution}</p>
+            </div>
+          `
+              : ""
+          }
+          ${
+            solution.organic
+              ? `
+            <div class="treatment-card">
+              <span class="treatment-type organic">🌿 Organic Treatment</span>
+              <h4>Eco-Friendly Alternative</h4>
+              <p>${solution.organic}</p>
+            </div>
+          `
+              : ""
+          }
+        </div>
+        ${getPesticideRecommendations(diseaseName)}
+        <div class="safety-warning">
+          <h4>⚠️ Safety Guidelines</h4>
+          <ul>
+            <li>Always wear protective gear (gloves, mask, goggles) when applying pesticides</li>
+            <li>Follow the recommended dosage - do not overdose</li>
+            <li>Maintain proper waiting period before harvesting</li>
+            <li>Apply during early morning or late evening</li>
+            <li>Keep children and pets away during application</li>
+            <li>Dispose of containers properly</li>
+            <li>Prefer organic treatments when possible</li>
+          </ul>
+        </div>
+      </div>
+    `;
+        } else if (isHealthy) {
+          html += `
+      <div class="treatment-section">
+        <h3>🎉 Your ${farmerCrop} Crop is Healthy!</h3>
+        <div class="treatment-card" style="border-left-color: #4caf50;">
+          <h4>Preventive Measures</h4>
+          <p><strong>Keep your ${farmerCrop} crop healthy by:</strong></p>
+          <ul style="padding-left: 20px; margin-top: 10px; color: #e0e0e0; line-height: 2;">
+            <li>Regular monitoring of plants</li>
+            <li>Maintaining proper irrigation</li>
+            <li>Applying organic fertilizers</li>
+            <li>Removing dead leaves promptly</li>
+            <li>Ensuring good air circulation</li>
+            <li>Crop rotation each season</li>
+          </ul>
+        </div>
+      </div>
+    `;
+        }
+
+        resultsSection.innerHTML = html;
+      }
+
+      // Get pesticide recommendations (keep existing function)
+      function getPesticideRecommendations(disease) {
+        const pesticideData = {
+          "late blight": [
+            {
+              name: "Copper Oxychloride",
+              type: "chemical",
+              dosage: "2.5g per liter of water",
+              frequency: "Every 7-10 days",
+              target: "Late Blight",
+            },
+            {
+              name: "Mancozeb",
+              type: "chemical",
+              dosage: "2g per liter of water",
+              frequency: "Weekly spray",
+              target: "Fungal diseases",
+            },
+          ],
+          "early blight": [
+            {
+              name: "Chlorothalonil",
+              type: "chemical",
+              dosage: "2ml per liter of water",
+              frequency: "Every 10 days",
+              target: "Early Blight",
+            },
+            {
+              name: "Neem Oil",
+              type: "organic",
+              dosage: "5ml per liter of water",
+              frequency: "Weekly",
+              target: "General fungal protection",
+            },
+          ],
+          "common rust": [
+            {
+              name: "Propiconazole",
+              type: "chemical",
+              dosage: "1ml per liter of water",
+              frequency: "Every 10-14 days",
+              target: "Rust diseases",
+            },
+            {
+              name: "Sulfur Fungicide",
+              type: "organic",
+              dosage: "3g per liter of water",
+              frequency: "Weekly",
+              target: "Rust control",
+            },
+          ],
+          "grey leaf spot": [
+            {
+              name: "Azoxystrobin",
+              type: "chemical",
+              dosage: "1.5ml per liter of water",
+              frequency: "Every 14 days",
+              target: "Leaf spot",
+            },
+          ],
+          "bacterial spot": [
+            {
+              name: "Copper Hydroxide",
+              type: "chemical",
+              dosage: "2.5g per liter of water",
+              frequency: "Every 5-7 days",
+              target: "Bacterial infections",
+            },
+          ],
+        };
+
+        let pesticides = [];
+        const diseaseLower = disease.toLowerCase();
+
+        for (const [key, value] of Object.entries(pesticideData)) {
+          if (diseaseLower.includes(key)) {
+            pesticides = value;
+            break;
+          }
+        }
+
+        if (pesticides.length === 0) {
+          pesticides = [
+            {
+              name: "Neem Oil (General)",
+              type: "organic",
+              dosage: "5ml per liter of water",
+              frequency: "Weekly",
+              target: "General disease prevention",
+            },
+            {
+              name: "Copper Fungicide",
+              type: "chemical",
+              dosage: "2.5g per liter of water",
+              frequency: "Every 10 days",
+              target: "Broad spectrum protection",
+            },
+          ];
+        }
+
+        return `
+    <div style="margin-top: 30px;">
+      <h3 style="color: #ffd54f; font-size: 22px; margin-bottom: 20px;">🧪 Recommended Pesticides</h3>
+      <div class="pesticide-grid">
+        ${pesticides
+          .map(
+            (p) => `
+          <div class="pesticide-card">
+            <h4>${p.name}</h4>
+            <span class="treatment-type ${p.type}">
+              ${p.type === "organic" ? "🌿 Organic" : "⚗️ Chemical"}
+            </span>
+            <p><strong>Target:</strong> ${p.target}</p>
+            <p><strong>Dosage:</strong> ${p.dosage}</p>
+            <p><strong>Frequency:</strong> ${p.frequency}</p>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+      }
+
+      // Load farmer crop on page load
+      loadFarmerCrop();
+    </script>
+  </body>
 </html>

@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Harvesting & Storage - AgriFusion</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(30, 60, 30, 0.85),
+            rgba(20, 40, 20, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1650&q=80")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
+
+      .header h1 {
+        color: #ffeb3b;
+        font-size: 28px;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+      }
+
+      /* Crop Banner */
+      .crop-banner {
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+      }
+
+      .crop-banner h2 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: #fff;
+      }
+
+      /* Section */
+      .section {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .section h3 {
+        color: #ffd54f;
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ffeb3b;
+        padding-bottom: 10px;
+      }
+
+      /* Info Grid */
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .info-card {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 25px;
+        border-radius: 12px;
+        border-left: 4px solid #4caf50;
+      }
+
+      .info-card h4 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+
+      .info-card p {
+        color: #e0e0e0;
+        line-height: 1.8;
+        margin: 8px 0;
+      }
+
+      .info-card ul {
+        padding-left: 20px;
+        color: #e0e0e0;
+        line-height: 2;
+      }
+
+      /* Market Prices */
+      .price-card {
+        background: linear-gradient(
+          135deg,
+          rgba(76, 175, 80, 0.2),
+          rgba(56, 142, 60, 0.2)
+        );
+        border: 2px solid #4caf50;
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 20px;
+      }
+
+      .price-card h4 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .price-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .price-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .price-item .label {
+        color: #c8e6c9;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      .price-item .value {
+        color: #fff;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .price-item .unit {
+        color: #a5d6a7;
+        font-size: 12px;
+      }
+
+      /* Storage Tips */
+      .tips-box {
+        background: rgba(33, 150, 243, 0.15);
+        border: 2px solid #2196f3;
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 20px;
+      }
+
+      .tips-box h4 {
+        color: #42a5f5;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .tips-box ul {
+        padding-left: 25px;
+        color: #e0e0e0;
+        line-height: 2;
+      }
+
+      /* Map Section */
+      #map {
+        height: 450px;
+        width: 100%;
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 2px solid rgba(255, 235, 59, 0.3);
+        position: relative;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #ffeb3b;
+      }
+
+      /* Custom Leaflet Popup */
+      .leaflet-popup-content-wrapper {
+        background: rgba(46, 125, 50, 0.95);
+        color: white;
+        border-radius: 8px;
+      }
+
+      .leaflet-popup-content {
+        margin: 10px;
+      }
+
+      .leaflet-popup-tip {
+        background: rgba(46, 125, 50, 0.95);
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .info-grid,
+        .price-info {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 15px;
+        }
+
+        #map {
+          height: 300px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <a href="stages.html" class="back-btn">← Back to Stages</a>
+      <h1>🚜 Harvesting & Storage</h1>
+      <div style="width: 120px"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Crop Banner -->
+      <div class="crop-banner" id="cropBanner">
+        <div class="loading">Loading crop information...</div>
+      </div>
+
+      <!-- Harvesting Methods -->
+      <div class="section">
+        <h3>🌾 Harvesting Guidelines</h3>
+        <div id="harvestingContent">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Market Prices -->
+      <div class="section">
+        <h3>💰 Current Market Prices</h3>
+        <div id="marketPrices">
+          <div class="loading">Loading market prices...</div>
+        </div>
+      </div>
+
+      <!-- Storage Methods -->
+      <div class="section">
+        <h3>📦 Storage & Preservation</h3>
+        <div id="storageContent">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Nearby Markets Map -->
+      <div class="section">
+        <h3>🗺️ Nearby Farm Markets & Mandis</h3>
+        <p style="color: #e0e0e0; margin-bottom: 15px">
+          🔍 Find nearby markets, mandis, and agricultural shops to sell your
+          harvest
+        </p>
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      const username = localStorage.getItem("username");
+
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      let farmerData = null;
+
+      // Comprehensive harvesting data
+      const harvestData = {
+        Rice: {
+          maturity:
+            "Grains turn golden yellow, 80% of grains are hard, moisture content 20-25%",
+          methods: [
+            "Manual harvesting with sickle",
+            "Combine harvester for large farms",
+          ],
+          timing: "Morning hours (7-10 AM) when dew has dried",
+          indicators: [
+            "Golden color of grains",
+            "Hard grain texture",
+            "Drooping panicles",
+          ],
+          postHarvest: [
+            "Dry immediately to 14% moisture",
+            "Thresh within 24 hours to avoid losses",
+            "Clean and grade before storage",
+            "Store in ventilated bags or bins",
+          ],
+          storage: [
+            "Maintain 14% moisture content",
+            "Store in cool, dry place (25-30°C)",
+            "Use hermetic bags for long-term storage",
+            "Check regularly for pests and moisture",
+            "Shelf life: 6-12 months",
+          ],
+          marketPrice: { min: 1800, max: 2200, unit: "per quintal" },
+        },
+        Wheat: {
+          maturity:
+            "Grains hard and golden, straw turns yellow, moisture 20-25%",
+          methods: ["Sickle cutting", "Combine harvester"],
+          timing: "Early morning or late evening",
+          indicators: [
+            "Golden yellow color",
+            "Hard grain when pressed",
+            "Straw is dry",
+          ],
+          postHarvest: [
+            "Dry to 12% moisture content",
+            "Thresh promptly to avoid grain loss",
+            "Clean thoroughly",
+            "Grade based on quality",
+          ],
+          storage: [
+            "Keep moisture below 12%",
+            "Store in jute bags or steel bins",
+            "Ensure good ventilation",
+            "Fumigate if storing long-term",
+            "Shelf life: 8-12 months",
+          ],
+          marketPrice: { min: 2000, max: 2500, unit: "per quintal" },
+        },
+        Maize: {
+          maturity: "Kernels fully filled, husks dry, plant turning yellow",
+          methods: ["Manual picking", "Mechanical corn picker"],
+          timing: "When moisture content is 20-25%",
+          indicators: [
+            "Dry husks",
+            "Hard kernels",
+            "Black layer at kernel base",
+          ],
+          postHarvest: [
+            "Dry cobs for 2-3 days in sun",
+            "Shell when moisture is 14-15%",
+            "Clean and grade kernels",
+            "Remove damaged grains",
+          ],
+          storage: [
+            "Dry to 13% moisture",
+            "Store in ventilated bins or bags",
+            "Keep away from moisture",
+            "Use insect-proof containers",
+            "Shelf life: 6-10 months",
+          ],
+          marketPrice: { min: 1700, max: 2100, unit: "per quintal" },
+        },
+        Potato: {
+          maturity: "Foliage yellow and dies, tubers firm with thick skin",
+          methods: [
+            "Manual digging with fork/spade",
+            "Mechanical potato digger",
+          ],
+          timing: "After vines die completely (90-120 days after planting)",
+          indicators: [
+            "Yellow, dying foliage",
+            "Firm tubers",
+            "Thick skin that doesn't rub off",
+          ],
+          postHarvest: [
+            "Cure for 10-14 days in dark at 15-20°C",
+            "Remove soil gently",
+            "Sort by size and quality",
+            "Discard damaged tubers",
+          ],
+          storage: [
+            "Store in dark, cool place (2-4°C)",
+            "Maintain 90-95% humidity",
+            "Use ventilated crates or bins",
+            "Check regularly, remove sprouting potatoes",
+            "Shelf life: 2-6 months depending on variety",
+          ],
+          marketPrice: { min: 800, max: 1500, unit: "per quintal" },
+        },
+        Pepper: {
+          maturity: "Fruits fully ripened and colored (green to red)",
+          methods: ["Hand picking"],
+          timing: "Pick when fruits reach desired color and firmness",
+          indicators: ["Bright color", "Firm texture", "Full size"],
+          postHarvest: [
+            "Sort by size and quality",
+            "Wash gently if needed",
+            "Dry completely before storage",
+            "Pack in ventilated containers",
+          ],
+          storage: [
+            "Store fresh peppers at 7-10°C",
+            "For dried: Store in airtight containers",
+            "Keep away from moisture",
+            "Dried pepper shelf life: 1-2 years",
+            "Fresh pepper: 2-3 weeks",
+          ],
+          marketPrice: { min: 15000, max: 25000, unit: "per quintal" },
+        },
+        Orange: {
+          maturity: "Fruits attain full color, firm but slightly soft",
+          methods: ["Hand picking with clippers"],
+          timing: "Pick during cool hours of day",
+          indicators: [
+            "Full orange color",
+            "Sweet taste",
+            "Slightly soft when pressed",
+          ],
+          postHarvest: [
+            "Handle carefully to avoid bruising",
+            "Clean and grade by size",
+            "Remove damaged fruits",
+            "Pack in ventilated boxes",
+          ],
+          storage: [
+            "Store at 3-5°C with 85-90% humidity",
+            "Keep in well-ventilated area",
+            "Check regularly for spoilage",
+            "Don't stack too high",
+            "Shelf life: 2-3 months",
+          ],
+          marketPrice: { min: 3000, max: 5000, unit: "per quintal" },
+        },
+        Grapes: {
+          maturity: "Berries soft and sweet, high sugar content",
+          methods: ["Hand picking with pruning shears"],
+          timing: "Early morning when cool",
+          indicators: ["Sweet taste", "Full color", "Soft berries"],
+          postHarvest: [
+            "Handle gently to avoid bruising",
+            "Cool immediately after harvest",
+            "Sort and pack in shallow containers",
+            "Maintain stem attachment",
+          ],
+          storage: [
+            "Store at 0-2°C immediately",
+            "Maintain 90-95% humidity",
+            "Use ventilated packaging",
+            "Consume or process quickly",
+            "Shelf life: 2-4 weeks",
+          ],
+          marketPrice: { min: 4000, max: 8000, unit: "per quintal" },
+        },
+      };
+
+      // Fetch farmer data
+      async function loadFarmerData() {
+        try {
+          const res = await fetch("http://localhost:5000/farmers");
+          if (!res.ok) throw new Error("Failed to fetch farmer data");
+
+          const farmers = await res.json();
+          farmerData = farmers.find((f) => f.username === username);
+
+          if (!farmerData) {
+            throw new Error("Farmer not found");
+          }
+
+          displayCropBanner(farmerData);
+          displayHarvestingInfo(farmerData);
+          displayMarketPrices(farmerData);
+          displayStorageInfo(farmerData);
+        } catch (error) {
+          console.error("Error loading data:", error);
+          document.getElementById("cropBanner").innerHTML = `
+            <div style="color: #f44336;">
+              ❌ Error loading data: ${error.message}
+            </div>
+          `;
+        }
+      }
+
+      // Display crop banner
+      function displayCropBanner(farmer) {
+        const crop = farmer.cropChosen || "Crop";
+        document.getElementById("cropBanner").innerHTML = `
+          <h2>🚜 Harvesting Guide for ${crop}</h2>
+          <p style="color: #fff3e0; font-size: 16px;">
+            Complete guide for harvesting, storage, and market information
+          </p>
+        `;
+      }
+
+      // Display harvesting information
+      function displayHarvestingInfo(farmer) {
+        const crop = farmer.cropChosen || "Wheat";
+        const data = harvestData[crop] || harvestData.Wheat;
+
+        document.getElementById("harvestingContent").innerHTML = `
+          <div class="info-grid">
+            <div class="info-card">
+              <h4>🎯 Maturity Signs</h4>
+              <p>${data.maturity}</p>
+              <ul style="margin-top: 10px;">
+                ${data.indicators.map((i) => `<li>${i}</li>`).join("")}
+              </ul>
+            </div>
+
+            <div class="info-card">
+              <h4>🛠️ Harvesting Methods</h4>
+              <ul>
+                ${data.methods.map((m) => `<li>${m}</li>`).join("")}
+              </ul>
+              <p style="margin-top: 15px;"><strong>Best Time:</strong> ${
+                data.timing
+              }</p>
+            </div>
+
+            <div class="info-card">
+              <h4>📋 Post-Harvest Steps</h4>
+              <ul>
+                ${data.postHarvest.map((p) => `<li>${p}</li>`).join("")}
+              </ul>
+            </div>
+          </div>
+        `;
+      }
+
+      // Display market prices
+      function displayMarketPrices(farmer) {
+        const crop = farmer.cropChosen || "Wheat";
+        const data = harvestData[crop] || harvestData.Wheat;
+        const price = data.marketPrice;
+
+        document.getElementById("marketPrices").innerHTML = `
+          <div class="price-card">
+            <h4>💵 Current ${crop} Market Rates</h4>
+            <div class="price-info">
+              <div class="price-item">
+                <div class="label">Minimum Price</div>
+                <div class="value">₹${price.min}</div>
+                <div class="unit">${price.unit}</div>
+              </div>
+              <div class="price-item">
+                <div class="label">Maximum Price</div>
+                <div class="value">₹${price.max}</div>
+                <div class="unit">${price.unit}</div>
+              </div>
+              <div class="price-item">
+                <div class="label">Average Price</div>
+                <div class="value">₹${Math.round(
+                  (price.min + price.max) / 2
+                )}</div>
+                <div class="unit">${price.unit}</div>
+              </div>
+            </div>
+            <p style="color: #c8e6c9; margin-top: 20px; text-align: center; font-size: 14px;">
+              💡 Prices vary based on quality, season, and location. Check local mandis for current rates.
+            </p>
+          </div>
+        `;
+      }
+
+      // Display storage information
+      function displayStorageInfo(farmer) {
+        const crop = farmer.cropChosen || "Wheat";
+        const data = harvestData[crop] || harvestData.Wheat;
+
+        document.getElementById("storageContent").innerHTML = `
+          <div class="tips-box">
+            <h4>📦 Proper Storage Guidelines</h4>
+            <ul>
+              ${data.storage.map((s) => `<li>${s}</li>`).join("")}
+            </ul>
+          </div>
+
+          <div class="tips-box" style="border-color: #ff9800; background: rgba(255, 152, 0, 0.15);">
+            <h4 style="color: #ff9800;">⚠️ Important Storage Tips</h4>
+            <ul>
+              <li>Always dry produce to recommended moisture levels before storage</li>
+              <li>Inspect stored produce regularly (weekly is recommended)</li>
+              <li>Use FIFO (First In, First Out) method for stored grain</li>
+              <li>Keep storage area clean and pest-free</li>
+              <li>Maintain proper ventilation to prevent mold growth</li>
+              <li>Consider hermetic storage for long-term preservation</li>
+            </ul>
+          </div>
+        `;
+      }
+
+      // Initialize Leaflet Map
+      function initMap() {
+        const mapDiv = document.getElementById("map");
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+
+              // Create map with dark theme
+              const map = L.map("map").setView([lat, lng], 13);
+
+              // Add OpenStreetMap tiles
+              L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                  attribution: "© OpenStreetMap contributors",
+                  maxZoom: 19,
+                }
+              ).addTo(map);
+
+              // Custom icon for user location
+              const userIcon = L.divIcon({
+                className: "custom-div-icon",
+                html: "<div style='background-color:#4caf50;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(76,175,80,0.8);'></div>",
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+              });
+
+              // Add marker for user location
+              L.marker([lat, lng], { icon: userIcon })
+                .addTo(map)
+                .bindPopup("<strong>📍 Your Location</strong>")
+                .openPopup();
+
+              // Search for nearby markets
+              searchNearbyMarkets(map, lat, lng);
+            },
+            (error) => {
+              mapDiv.innerHTML = `
+                <div style="padding: 60px 20px; text-align: center; color: #ff9800; background: rgba(0,0,0,0.5); border-radius: 10px; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 48px; margin-bottom: 15px;">📍</div>
+                  <h4 style="margin-bottom: 10px; color: #ffeb3b;">Location Access Required</h4>
+                  <p>Please enable location services to view nearby markets and mandis.</p>
+                  <p style="margin-top: 15px; font-size: 14px; color: #ccc;">
+                    You can still use all other features without location access.
+                  </p>
+                </div>
+              `;
+            }
+          );
+        } else {
+          mapDiv.innerHTML = `
+            <div style="padding: 60px 20px; text-align: center; color: #f44336; background: rgba(0,0,0,0.5); border-radius: 10px; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+              <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
+              <p>Geolocation is not supported by your browser.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Search nearby markets using Overpass API (OpenStreetMap data)
+      // Search nearby markets using Overpass API (OpenStreetMap data)
+      // Show nearby markets (using known Bengaluru locations)
+      function searchNearbyMarkets(map, lat, lng) {
+        // Real markets and mandis in Bengaluru
+        const bengaluruMarkets = [
+          {
+            name: "KR Market (City Market)",
+            lat: 12.9634,
+            lng: 77.5855,
+            type: "Wholesale Vegetable & Fruit Market",
+          },
+          {
+            name: "Yeshwanthpur APMC Mandi",
+            lat: 13.028,
+            lng: 77.538,
+            type: "Agricultural Produce Market",
+          },
+          {
+            name: "Binny Mills Wholesale Market",
+            lat: 12.995,
+            lng: 77.5644,
+            type: "Wholesale Market",
+          },
+          {
+            name: "Madiwala Market",
+            lat: 12.9141,
+            lng: 77.6211,
+            type: "Wholesale & Retail Market",
+          },
+          {
+            name: "Gandhi Bazaar",
+            lat: 12.942,
+            lng: 77.574,
+            type: "Traditional Market",
+          },
+          {
+            name: "Malleswaram Market",
+            lat: 13.005,
+            lng: 77.571,
+            type: "Local Vegetable Market",
+          },
+          {
+            name: "Jayanagar 4th Block Market",
+            lat: 12.925,
+            lng: 77.595,
+            type: "Shopping Complex",
+          },
+          {
+            name: "Russell Market",
+            lat: 12.9716,
+            lng: 77.6095,
+            type: "Meat & Vegetable Market",
+          },
+          {
+            name: "Avenue Road Market",
+            lat: 12.982,
+            lng: 77.573,
+            type: "Wholesale Market",
+          },
+          {
+            name: "Chickpet Market",
+            lat: 12.965,
+            lng: 77.578,
+            type: "Wholesale Trading",
+          },
+          {
+            name: "Shivaji Nagar Market",
+            lat: 12.989,
+            lng: 77.603,
+            type: "Retail Market",
+          },
+          {
+            name: "Kormangala Market",
+            lat: 12.9352,
+            lng: 77.6245,
+            type: "Supermarket Complex",
+          },
+          {
+            name: "Indiranagar Market",
+            lat: 12.9784,
+            lng: 77.6408,
+            type: "Local Market",
+          },
+          {
+            name: "HSR Layout Market",
+            lat: 12.9116,
+            lng: 77.6382,
+            type: "Shopping Area",
+          },
+          {
+            name: "Banashankari Market",
+            lat: 12.925,
+            lng: 77.5483,
+            type: "Local Market",
+          },
+        ];
+
+        const marketIcon = L.divIcon({
+          className: "custom-div-icon",
+          html: "<div style='background-color:#ff5722;width:18px;height:18px;border-radius:50%;border:2px solid white;box-shadow:0 0 10px rgba(255,87,34,0.9);'></div>",
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+        });
+
+        let added = 0;
+        bengaluruMarkets.forEach((market) => {
+          const distance = calculateDistance(lat, lng, market.lat, market.lng);
+
+          // Show markets within 25km
+          if (distance < 25) {
+            L.marker([market.lat, market.lng], { icon: marketIcon }).addTo(map)
+              .bindPopup(`
+          <div style="color: white; min-width: 180px;">
+            <strong>🏪 ${market.name}</strong><br>
+            <small style="color: #ffccbc;">${market.type}</small><br>
+            <small style="color: #fff59d;">📍 ${distance.toFixed(
+              1
+            )} km away</small>
+          </div>
+        `);
+            added++;
+          }
+        });
+
+        if (added > 0) {
+          const infoDiv = document.createElement("div");
+          infoDiv.style.cssText = `
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 87, 34, 0.95);
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      text-align: center;
+    `;
+          infoDiv.textContent = `🛒 Found ${added} markets within 25km`;
+          document.getElementById("map").appendChild(infoDiv);
+          setTimeout(() => infoDiv.remove(), 4000);
+        }
+
+        console.log(`✅ Displayed ${added} markets`);
+      }
+
+      // Calculate distance between two coordinates (Haversine formula)
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of Earth in km
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
+
+      // Show message when no markets found
+      function showNoMarketsMessage(map) {
+        const infoDiv = document.createElement("div");
+        infoDiv.style.cssText = `
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 152, 0, 0.95);
+    padding: 15px 25px;
+    border-radius: 10px;
+    z-index: 1000;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    max-width: 90%;
+    text-align: center;
+  `;
+        infoDiv.innerHTML = `
+    📍 No markets found in OpenStreetMap data<br>
+    <small style="font-weight: normal; margin-top: 8px; display: block;">
+      Try zooming out or checking Google Maps for local mandis and markets
+    </small>
+  `;
+        document.getElementById("map").appendChild(infoDiv);
+      }
+
+      // Show sample markets as fallback (for Bengaluru area)
+      function showSampleMarkets(map, userLat, userLng) {
+        // Sample markets in Bengaluru (you can add more for different regions)
+        const sampleMarkets = [
+          {
+            name: "KR Market (City Market)",
+            lat: 12.9634,
+            lng: 77.5855,
+            type: "Wholesale Market",
+          },
+          {
+            name: "Yeshwanthpur APMC",
+            lat: 13.028,
+            lng: 77.538,
+            type: "Agricultural Market",
+          },
+          {
+            name: "Binny Mills Market",
+            lat: 12.995,
+            lng: 77.5644,
+            type: "Wholesale Market",
+          },
+          {
+            name: "Gandhi Bazaar",
+            lat: 12.942,
+            lng: 77.574,
+            type: "Retail Market",
+          },
+          {
+            name: "Malleswaram Market",
+            lat: 13.005,
+            lng: 77.571,
+            type: "Local Market",
+          },
+        ];
+
+        const marketIcon = L.divIcon({
+          className: "custom-div-icon",
+          html: "<div style='background-color:#9c27b0;width:18px;height:18px;border-radius:50%;border:2px solid white;box-shadow:0 0 10px rgba(156,39,176,0.9);'></div>",
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+        });
+
+        let added = 0;
+        sampleMarkets.forEach((market) => {
+          const distance = calculateDistance(
+            userLat,
+            userLng,
+            market.lat,
+            market.lng
+          );
+
+          // Only show if within 50km
+          if (distance < 50) {
+            L.marker([market.lat, market.lng], { icon: marketIcon }).addTo(map)
+              .bindPopup(`
+          <div style="color: white; min-width: 150px;">
+            <strong>🏪 ${market.name}</strong><br>
+            <small style="color: #e1bee7;">Type: ${market.type}</small><br>
+            <small style="color: #fff59d;">📍 ${distance.toFixed(
+              1
+            )} km away</small><br>
+            <small style="color: #ccc; font-style: italic;">Sample location</small>
+          </div>
+        `);
+            added++;
+          }
+        });
+
+        if (added > 0) {
+          const infoDiv = document.createElement("div");
+          infoDiv.style.cssText = `
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(156, 39, 176, 0.95);
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      text-align: center;
+    `;
+          infoDiv.innerHTML = `
+      ℹ️ Showing ${added} sample markets<br>
+      <small style="font-weight: normal;">Purple markers are sample locations</small>
+    `;
+          document.getElementById("map").appendChild(infoDiv);
+          setTimeout(() => infoDiv.remove(), 5000);
+        }
+      }
+      // Load farmer data and initialize map
+      loadFarmerData();
+
+      // Initialize map after page loads
+      window.addEventListener("load", () => {
+        setTimeout(initMap, 500); // Small delay to ensure map div is ready
+      });
+    </script>
+  </body>
+</html>

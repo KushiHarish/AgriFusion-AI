@@ -1,26 +1,496 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>🧑‍💼 Welcome, Admin!</h1>
-  <p>Manage user accounts, monitor activities, and approve new crop data or policies.</p>
-  <button onclick="logout()">Logout</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      h1 {
+        color: #2e7d32;
+      }
+      .logout-btn {
+        background: #d32f2f;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .logout-btn:hover {
+        background: #b71c1c;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .stat-card h3 {
+        color: #2e7d32;
+        font-size: 32px;
+        margin-bottom: 5px;
+      }
+      .stat-card p {
+        color: #666;
+        font-size: 14px;
+      }
+      .table-container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th {
+        background: #2e7d32;
+        color: white;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+      }
+      tr:hover {
+        background: #f5f5f5;
+      }
+      button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+        font-size: 12px;
+        transition: all 0.3s;
+      }
+      .view-btn {
+        background: #1976d2;
+        color: white;
+      }
+      .view-btn:hover {
+        background: #1565c0;
+      }
+      .delete-btn {
+        background: #d32f2f;
+        color: white;
+      }
+      .delete-btn:hover {
+        background: #b71c1c;
+      }
+      .toggle-btn {
+        background: #388e3c;
+        color: white;
+      }
+      .toggle-btn:hover {
+        background: #2e7d32;
+      }
+      .status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .status.active {
+        background: #c8e6c9;
+        color: #2e7d32;
+      }
+      .status.inactive {
+        background: #ffcdd2;
+        color: #c62828;
+      }
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        overflow-y: auto;
+      }
+      .modal-content {
+        background: white;
+        margin: 50px auto;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #2e7d32;
+        padding-bottom: 10px;
+      }
+      .close-btn {
+        background: #d32f2f;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .detail-section {
+        margin-bottom: 20px;
+      }
+      .detail-section h3 {
+        color: #2e7d32;
+        margin-bottom: 10px;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+      .detail-item {
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 5px;
+      }
+      .detail-item strong {
+        color: #2e7d32;
+      }
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <h1>👨‍💼 Admin Dashboard - AgriFusion</h1>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
 
-  <script>
-    const role = localStorage.getItem("userRole");
-    if (role !== "admin") {
-      alert("Access denied!");
-      window.location.href = "login.html";
-    }
+    <!-- Stats Cards -->
+    <div class="stats">
+      <div class="stat-card">
+        <h3 id="totalFarmers">0</h3>
+        <p>Total Farmers</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="activeFarmers">0</h3>
+        <p>Active Farmers</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="inactiveFarmers">0</h3>
+        <p>Inactive Farmers</p>
+      </div>
+    </div>
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "login.html";
-    }
-  </script>
-</body>
+    <!-- Farmers Table -->
+    <div class="table-container">
+      <h2 style="color: #2e7d32; margin-bottom: 10px">📋 Registered Farmers</h2>
+      <table id="farmersTable">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Crop Chosen</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="7" class="no-data">Loading farmers...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal for Farmer Details -->
+    <div id="farmerModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>👨‍🌾 Farmer Details</h2>
+          <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <script>
+      let farmersData = [];
+
+      // Fetch all farmers
+      async function fetchFarmers() {
+        try {
+          const res = await fetch("http://localhost:5000/farmers");
+
+          if (!res.ok) {
+            throw new Error("Failed to fetch farmers");
+          }
+
+          farmersData = await res.json();
+          displayFarmers(farmersData);
+          updateStats(farmersData);
+        } catch (error) {
+          console.error("Error fetching farmers:", error);
+          const tbody = document.querySelector("#farmersTable tbody");
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="no-data">❌ Failed to load farmers. Make sure server is running!</td></tr>';
+        }
+      }
+
+      // Display farmers in table
+      function displayFarmers(farmers) {
+        const tbody = document.querySelector("#farmersTable tbody");
+
+        if (farmers.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="no-data">No farmers registered yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = "";
+
+        farmers.forEach((farmer) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${farmer.username || "N/A"}</td>
+            <td>${farmer.name || "N/A"}</td>
+            <td>${farmer.email || "N/A"}</td>
+            <td>${farmer.phone || "N/A"}</td>
+            <td>${farmer.cropChosen || "Not selected"}</td>
+            <td><span class="status ${farmer.status}">${
+            farmer.status || "active"
+          }</span></td>
+            <td>
+              <button class="view-btn" onclick="viewFarmer('${
+                farmer._id
+              }')">View</button>
+              <button class="toggle-btn" onclick="toggleStatus('${
+                farmer._id
+              }')">Toggle</button>
+              <button class="delete-btn" onclick="deleteFarmer('${
+                farmer._id
+              }', '${farmer.username}')">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      // Update statistics
+      function updateStats(farmers) {
+        document.getElementById("totalFarmers").textContent = farmers.length;
+        document.getElementById("activeFarmers").textContent = farmers.filter(
+          (f) => f.status === "active"
+        ).length;
+        document.getElementById("inactiveFarmers").textContent = farmers.filter(
+          (f) => f.status === "inactive"
+        ).length;
+      }
+
+      // View farmer details
+      function viewFarmer(id) {
+        const farmer = farmersData.find((f) => f._id === id);
+
+        if (!farmer) {
+          alert("Farmer not found!");
+          return;
+        }
+
+        const modalBody = document.getElementById("modalBody");
+        modalBody.innerHTML = `
+          <div class="detail-section">
+            <h3>👤 Basic Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item"><strong>Username:</strong> ${
+                farmer.username || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Name:</strong> ${
+                farmer.name || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Email:</strong> ${
+                farmer.email || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Phone:</strong> ${
+                farmer.phone || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Age:</strong> ${
+                farmer.age || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Address:</strong> ${
+                farmer.address || "N/A"
+              }</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>🌾 Land Details</h3>
+            <div class="detail-grid">
+              <div class="detail-item"><strong>Soil Type:</strong> ${
+                farmer.landDetails?.soilType || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Land Size:</strong> ${
+                farmer.landDetails?.landSize || "N/A"
+              } acres</div>
+              <div class="detail-item"><strong>Water Resource:</strong> ${
+                farmer.landDetails?.waterResource || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Previous Crop:</strong> ${
+                farmer.landDetails?.previousCrop || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Irrigation:</strong> ${
+                farmer.landDetails?.irrigationPreference || "N/A"
+              }</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>🌱 Soil Test Data</h3>
+            <div class="detail-grid">
+              <div class="detail-item"><strong>Nitrogen (N):</strong> ${
+                farmer.soilDetails?.N || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Phosphorus (P):</strong> ${
+                farmer.soilDetails?.P || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Potassium (K):</strong> ${
+                farmer.soilDetails?.K || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Temperature:</strong> ${
+                farmer.soilDetails?.temperature || "N/A"
+              }°C</div>
+              <div class="detail-item"><strong>Humidity:</strong> ${
+                farmer.soilDetails?.humidity || "N/A"
+              }%</div>
+              <div class="detail-item"><strong>pH:</strong> ${
+                farmer.soilDetails?.ph || "N/A"
+              }</div>
+              <div class="detail-item"><strong>Moisture:</strong> ${
+                farmer.soilDetails?.moisture || "N/A"
+              }%</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>🌽 Crop Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item"><strong>Crop Chosen:</strong> ${
+                farmer.cropChosen || "Not selected"
+              }</div>
+              <div class="detail-item"><strong>Status:</strong> <span class="status ${
+                farmer.status
+              }">${farmer.status || "active"}</span></div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("farmerModal").style.display = "block";
+      }
+
+      // Close modal
+      function closeModal() {
+        document.getElementById("farmerModal").style.display = "none";
+      }
+
+      // Delete farmer
+      async function deleteFarmer(id, username) {
+        if (!confirm(`Are you sure you want to delete farmer "${username}"?`)) {
+          return;
+        }
+
+        try {
+          const res = await fetch(`http://localhost:5000/farmer/${id}`, {
+            method: "DELETE",
+          });
+
+          if (res.ok) {
+            alert("Farmer deleted successfully!");
+            fetchFarmers();
+          } else {
+            alert("Failed to delete farmer!");
+          }
+        } catch (error) {
+          console.error("Error deleting farmer:", error);
+          alert("Error deleting farmer!");
+        }
+      }
+
+      // Toggle farmer status
+      async function toggleStatus(id) {
+        try {
+          const res = await fetch(`http://localhost:5000/farmer/status/${id}`, {
+            method: "PUT",
+          });
+
+          if (res.ok) {
+            fetchFarmers();
+          } else {
+            alert("Failed to toggle status!");
+          }
+        } catch (error) {
+          console.error("Error toggling status:", error);
+          alert("Error toggling status!");
+        }
+      }
+
+      // Logout
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.clear();
+          window.location.href = "login.html";
+        }
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function (event) {
+        const modal = document.getElementById("farmerModal");
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+
+      // Load farmers on page load
+      fetchFarmers();
+    </script>
+  </body>
 </html>

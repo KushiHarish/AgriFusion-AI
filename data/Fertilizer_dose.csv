@@ -1,0 +1,21 @@
+Crop Type,Fertilizer Type,Fertilizer Name,N (kg/ha),P (kg/ha),K (kg/ha),Notes
+Maize,Chemical,Urea,50,0,0,Split dose
+maize,Chemical,25-10-2015,25,10,15,Apply during vegetative stage
+Maize,Organic,Farmyard Manure,25,15,20,Pre-planting application
+Grapes,Chemical,Complex NPK,70,50,60,Apply in 3 equal splits during growth
+Grapes,Chemical,Urea,60,0,0,Use for vegetative growth
+Grapes,Organic,Vermicompost,30,20,25,Apply around root zone before flowering
+Orange,Chemical,Ammonium Sulphate,100,40,60,Apply in two equal splits per year
+Orange,Chemical,MOP,0,0,60,Enhances fruit size and sweetness
+Orange,Organic,Compost,40,25,35,Apply during pit preparation
+Potato,Chemical,Urea,120,0,0,Top dressing at 30 and 45 days after planting
+Potato,Chemical,DAP,0,60,0,Apply at sowing time
+Potato,Chemical,MOP,0,0,100,Improves tuber quality
+Potato,Organic,Farmyard Manure,25,20,20,Apply before planting
+Pepper,Chemical,Urea,50,0,0,Apply in 2-3 splits during growing season
+Pepper,Chemical,SSP,0,30,0,Basal application
+Pepper,Chemical,MOP,0,0,60,Apply during fruit formation
+Pepper,Organic,Compost,20,15,15,Apply once before planting
+Maize,Chemical,20-20-20,20,20,20,Balanced NPK fertilizer
+Grapes,Chemical,25-10-2015,25,10,20,Suitable for flowering stage
+Potato,Chemical,30-10-2020,30,10,20,Enhances root and tuber growth

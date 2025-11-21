@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Rotation - AgriFusion</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+            rgba(30, 60, 30, 0.85),
+            rgba(20, 40, 20, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1650&q=80")
+            no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #d32f2f;
+        transform: scale(1.05);
+      }
+
+      .header h1 {
+        color: #ffeb3b;
+        font-size: 28px;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 30px;
+      }
+
+      /* Crop Banner */
+      .crop-banner {
+        background: linear-gradient(135deg, #4caf50, #66bb6a);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      }
+
+      .crop-banner h2 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: #fff;
+      }
+
+      .crop-banner p {
+        font-size: 16px;
+        color: #e8f5e9;
+      }
+
+      /* Info Section */
+      .info-section {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 235, 59, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .info-section h3 {
+        color: #ffd54f;
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .info-section p {
+        color: #e0e0e0;
+        line-height: 1.8;
+        margin-bottom: 15px;
+      }
+
+      .benefits-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .benefit-item {
+        background: rgba(76, 175, 80, 0.15);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #4caf50;
+      }
+
+      .benefit-item strong {
+        color: #4caf50;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      /* Section Title */
+      .section-title {
+        text-align: center;
+        font-size: 28px;
+        margin: 30px 0 25px;
+        color: #ffeb3b;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Rotation Cards Grid */
+      .rotation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+      }
+
+      .rotation-card {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 15px;
+        padding: 25px;
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .rotation-card:hover {
+        transform: translateY(-8px);
+        border-color: #4caf50;
+        box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5);
+      }
+
+      .rotation-card h4 {
+        color: #4caf50;
+        font-size: 22px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .crop-icon {
+        font-size: 28px;
+      }
+
+      .rotation-card .reason {
+        background: rgba(33, 150, 243, 0.15);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border-left: 3px solid #2196f3;
+      }
+
+      .rotation-card .reason strong {
+        color: #42a5f5;
+      }
+
+      .rotation-card .reason p {
+        color: #e0e0e0;
+        margin-top: 5px;
+        line-height: 1.6;
+      }
+
+      .benefits {
+        margin-top: 15px;
+      }
+
+      .benefits strong {
+        color: #ffd54f;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .benefits ul {
+        padding-left: 20px;
+        color: #e0e0e0;
+        line-height: 2;
+      }
+
+      .benefits li {
+        margin-bottom: 5px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-top: 15px;
+        margin-right: 8px;
+      }
+
+      .badge.nitrogen-fixer {
+        background: #4caf50;
+        color: white;
+      }
+
+      .badge.pest-control {
+        background: #ff9800;
+        color: white;
+      }
+
+      .badge.short-duration {
+        background: #2196f3;
+        color: white;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #ffeb3b;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .rotation-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <a href="stages.html" class="back-btn">← Back to Stages</a>
+      <h1>♻️ Crop Rotation Planning</h1>
+      <div style="width: 120px"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Crop Banner -->
+      <div class="crop-banner" id="cropBanner">
+        <div class="loading">Loading your crop information...</div>
+      </div>
+
+      <!-- Why Crop Rotation -->
+      <div class="info-section">
+        <h3>🌱 Why Crop Rotation is Important</h3>
+        <p>
+          Crop rotation is the practice of growing different crops sequentially
+          on the same land. This sustainable farming technique helps maintain
+          soil health, break pest and disease cycles, and improve overall farm
+          productivity.
+        </p>
+
+        <div class="benefits-list">
+          <div class="benefit-item">
+            <strong>🌿 Soil Health</strong>
+            Prevents nutrient depletion and improves soil structure
+          </div>
+          <div class="benefit-item">
+            <strong>🦠 Disease Control</strong>
+            Breaks disease and pest cycles naturally
+          </div>
+          <div class="benefit-item">
+            <strong>💰 Better Yields</strong>
+            Increases productivity and reduces input costs
+          </div>
+          <div class="benefit-item">
+            <strong>♻️ Sustainability</strong>
+            Reduces need for chemical fertilizers
+          </div>
+        </div>
+      </div>
+
+      <!-- Rotation Suggestions -->
+      <h2 class="section-title">🔄 Recommended Crops for Next Season</h2>
+
+      <div class="rotation-grid" id="rotationGrid">
+        <div class="loading">Loading rotation suggestions...</div>
+      </div>
+    </div>
+
+    <script>
+      const username = localStorage.getItem("username");
+
+      if (!username) {
+        alert("⚠️ Please login first!");
+        window.location.href = "login.html";
+      }
+
+      let farmerData = null;
+
+      // Comprehensive rotation data
+      const rotationData = {
+        Rice: [
+          {
+            name: "Green Gram (Moong)",
+            icon: "🌱",
+            reason:
+              "Legume that fixes atmospheric nitrogen, restoring soil fertility",
+            benefits: [
+              "Adds 30-40 kg N per hectare",
+              "Short duration (60-70 days)",
+              "Low water requirement",
+            ],
+            badges: ["nitrogen-fixer", "short-duration"],
+          },
+          {
+            name: "Black Gram (Urad)",
+            icon: "🫘",
+            reason: "Enriches soil with nitrogen and improves soil structure",
+            benefits: [
+              "Nitrogen fixation",
+              "Breaks rice pest cycle",
+              "Good market value",
+            ],
+            badges: ["nitrogen-fixer", "pest-control"],
+          },
+          {
+            name: "Mustard",
+            icon: "🌼",
+            reason: "Deep roots improve soil aeration and prevent compaction",
+            benefits: [
+              "Controls weeds naturally",
+              "Fast growing (90-120 days)",
+              "Oil seed crop",
+            ],
+            badges: ["pest-control"],
+          },
+        ],
+        Wheat: [
+          {
+            name: "Soybean",
+            icon: "🫘",
+            reason:
+              "Excellent nitrogen fixer that replenishes depleted soil nutrients",
+            benefits: [
+              "Adds 50-80 kg N per hectare",
+              "Breaks wheat disease cycle",
+              "High protein crop",
+            ],
+            badges: ["nitrogen-fixer", "pest-control"],
+          },
+          {
+            name: "Maize",
+            icon: "🌽",
+            reason:
+              "Different nutrient uptake pattern prevents soil exhaustion",
+            benefits: [
+              "Utilizes deep soil nutrients",
+              "Breaks wheat rust cycle",
+              "Good fodder value",
+            ],
+            badges: ["pest-control"],
+          },
+          {
+            name: "Chickpea (Chana)",
+            icon: "🫘",
+            reason: "Legume that fixes nitrogen and improves soil health",
+            benefits: [
+              "Nitrogen fixation",
+              "Drought tolerant",
+              "Premium market price",
+            ],
+            badges: ["nitrogen-fixer", "short-duration"],
+          },
+        ],
+        Maize: [
+          {
+            name: "Soybean",
+            icon: "🫘",
+            reason: "Improves soil nitrogen and breaks pest cycle",
+            benefits: [
+              "Nitrogen fixation",
+              "Reduces soil depletion",
+              "Improves next maize yield",
+            ],
+            badges: ["nitrogen-fixer", "pest-control"],
+          },
+          {
+            name: "Cowpea",
+            icon: "🌱",
+            reason: "Legume that restores soil fertility quickly",
+            benefits: ["Adds nitrogen", "Reduces weeds", "Low water use"],
+            badges: ["nitrogen-fixer", "short-duration"],
+          },
+          {
+            name: "Sunflower",
+            icon: "🌻",
+            reason: "Deep roots improve soil structure and prevent compaction",
+            benefits: [
+              "Breaks disease cycle",
+              "Improves organic matter",
+              "Oil seed crop",
+            ],
+            badges: ["pest-control"],
+          },
+          {
+            name: "Groundnut",
+            icon: "🥜",
+            reason: "Legume enriching soil fertility significantly",
+            benefits: [
+              "Adds nitrogen",
+              "Good soil aeration",
+              "High economic value",
+            ],
+            badges: ["nitrogen-fixer"],
+          },
+        ],
+        Potato: [
+          {
+            name: "Maize",
+            icon: "🌽",
+            reason: "Improves yield and controls potato-specific pests",
+            benefits: [
+              "Reduces soil diseases",
+              "Different nutrient needs",
+              "Breaks nematode cycle",
+            ],
+            badges: ["pest-control"],
+          },
+          {
+            name: "Soybean",
+            icon: "🫘",
+            reason: "Adds nitrogen and balances soil nutrients",
+            benefits: [
+              "Nitrogen fixation",
+              "Prevents nutrient depletion",
+              "Good market value",
+            ],
+            badges: ["nitrogen-fixer"],
+          },
+          {
+            name: "Wheat",
+            icon: "🌾",
+            reason: "Efficient water use and improves soil tilth",
+            benefits: [
+              "Breaks disease cycle",
+              "Winter crop option",
+              "Stable market",
+            ],
+            badges: ["pest-control"],
+          },
+          {
+            name: "Cabbage",
+            icon: "🥬",
+            reason: "Prevents pest buildup and improves soil health",
+            benefits: [
+              "Different pest profile",
+              "Good organic residue",
+              "High market demand",
+            ],
+            badges: ["pest-control", "short-duration"],
+          },
+        ],
+        Pepper: [
+          {
+            name: "Maize",
+            icon: "🌽",
+            reason: "Reduces pepper wilt and nematode population",
+            benefits: ["Breaks pest cycle", "Improves soil", "Good biomass"],
+            badges: ["pest-control"],
+          },
+          {
+            name: "Cowpea",
+            icon: "🌱",
+            reason: "Adds nitrogen and improves soil fertility",
+            benefits: [
+              "Nitrogen fixation",
+              "Short duration",
+              "Better soil health",
+            ],
+            badges: ["nitrogen-fixer", "short-duration"],
+          },
+          {
+            name: "Groundnut",
+            icon: "🥜",
+            reason: "Legume crop enriching soil significantly",
+            benefits: [
+              "Nitrogen fixer",
+              "Prevents nutrient loss",
+              "Good economic return",
+            ],
+            badges: ["nitrogen-fixer"],
+          },
+          {
+            name: "Sunflower",
+            icon: "🌻",
+            reason: "Improves nutrient cycling and pest control",
+            benefits: [
+              "Deep root system",
+              "Breaks disease cycle",
+              "Oil seed crop",
+            ],
+            badges: ["pest-control"],
+          },
+        ],
+        Orange: [
+          {
+            name: "Green Gram",
+            icon: "🌱",
+            reason: "Legume that fixes nitrogen quickly",
+            benefits: [
+              "Restores fertility",
+              "Short duration (60 days)",
+              "Low maintenance",
+            ],
+            badges: ["nitrogen-fixer", "short-duration"],
+          },
+          {
+            name: "Groundnut",
+            icon: "🥜",
+            reason: "Legume enhancing fertility and breaking pest cycles",
+            benefits: [
+              "Nitrogen fixation",
+              "Good market value",
+              "Improves soil texture",
+            ],
+            badges: ["nitrogen-fixer", "pest-control"],
+          },
+          {
+            name: "Soybean",
+            icon: "🫘",
+            reason: "Boosts nitrogen and suppresses weeds effectively",
+            benefits: [
+              "High nitrogen addition",
+              "Weed control",
+              "Protein-rich crop",
+            ],
+            badges: ["nitrogen-fixer"],
+          },
+          {
+            name: "Sunflower",
+            icon: "🌻",
+            reason: "Enhances soil porosity and reduces compaction",
+            benefits: ["Deep roots", "Breaks pest cycle", "Drought tolerant"],
+            badges: ["pest-control"],
+          },
+        ],
+        Grapes: [
+          {
+            name: "Barley",
+            icon: "🌾",
+            reason: "Good rotation to break pest and disease cycle",
+            benefits: [
+              "Improves soil structure",
+              "Controls nematodes",
+              "Winter crop",
+            ],
+            badges: ["pest-control"],
+          },
+          {
+            name: "Mustard",
+            icon: "🌼",
+            reason: "Non-host crop to grapevine diseases",
+            benefits: ["Pest control", "Improves soil", "Oil seed crop"],
+            badges: ["pest-control", "short-duration"],
+          },
+          {
+            name: "Pea",
+            icon: "🫛",
+            reason: "Fixes nitrogen in the soil effectively",
+            benefits: [
+              "Restores fertility",
+              "Improves yield next season",
+              "Winter vegetable",
+            ],
+            badges: ["nitrogen-fixer"],
+          },
+          {
+            name: "Wheat",
+            icon: "🌾",
+            reason: "Improves soil structure and drainage",
+            benefits: [
+              "Enhances rotation diversity",
+              "Good market",
+              "Winter crop",
+            ],
+            badges: ["pest-control"],
+          },
+        ],
+      };
+
+      // Fetch farmer data
+      async function loadFarmerData() {
+        try {
+          const res = await fetch("http://localhost:5000/farmers");
+          if (!res.ok) throw new Error("Failed to fetch farmer data");
+
+          const farmers = await res.json();
+          farmerData = farmers.find((f) => f.username === username);
+
+          if (!farmerData) {
+            throw new Error("Farmer not found");
+          }
+
+          displayCropBanner(farmerData);
+          displayRotationSuggestions(farmerData);
+        } catch (error) {
+          console.error("Error loading data:", error);
+          document.getElementById("cropBanner").innerHTML = `
+            <div style="color: #f44336;">
+              ❌ Error loading data: ${error.message}
+            </div>
+          `;
+        }
+      }
+
+      // Display crop banner
+      function displayCropBanner(farmer) {
+        const crop = farmer.cropChosen || "Crop";
+        document.getElementById("cropBanner").innerHTML = `
+          <h2>♻️ Crop Rotation Plan After ${crop}</h2>
+          <p>Sustainable crop suggestions to maintain soil health and improve yields</p>
+        `;
+      }
+
+      // Display rotation suggestions
+      function displayRotationSuggestions(farmer) {
+        const crop = farmer.cropChosen || "Wheat";
+        const suggestions = rotationData[crop] || rotationData.Wheat;
+
+        if (suggestions && suggestions.length > 0) {
+          const html = suggestions
+            .map(
+              (suggestion) => `
+            <div class="rotation-card">
+              <h4>
+                <span class="crop-icon">${suggestion.icon}</span>
+                ${suggestion.name}
+              </h4>
+              
+              <div class="reason">
+                <strong>💡 Why This Crop?</strong>
+                <p>${suggestion.reason}</p>
+              </div>
+
+              <div class="benefits">
+                <strong>✨ Key Benefits:</strong>
+                <ul>
+                  ${suggestion.benefits.map((b) => `<li>${b}</li>`).join("")}
+                </ul>
+              </div>
+
+              <div>
+                ${suggestion.badges
+                  .map((badge) => {
+                    const labels = {
+                      "nitrogen-fixer": "🌱 Nitrogen Fixer",
+                      "pest-control": "🦠 Pest Control",
+                      "short-duration": "⏱️ Short Duration",
+                    };
+                    return `<span class="badge ${badge}">${labels[badge]}</span>`;
+                  })
+                  .join("")}
+              </div>
+            </div>
+          `
+            )
+            .join("");
+
+          document.getElementById("rotationGrid").innerHTML = html;
+        } else {
+          document.getElementById("rotationGrid").innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #ff9800;">
+              <h3>📋 No rotation data available for ${crop}</h3>
+              <p>Please consult an agricultural expert for crop rotation suggestions.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Load data on page load
+      loadFarmerData();
+    </script>
+  </body>
+</html>

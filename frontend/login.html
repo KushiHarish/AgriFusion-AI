@@ -1,79 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - AgriFusion</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="login">
-    <div class="form-box">
-      <h2>Login</h2>
-      <form id="loginForm">
-        <div class="input-group">
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username" required>
-        </div>
-
-        <div class="input-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required>
-        </div>
-
-        <button type="submit">Login</button>
-      </form>
-
-      <p>Don’t have an account? <a href="form1.html">Register here</a></p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriFusion Login</title>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #56ab2f, #a8e063);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        width: 400px;
+      }
+      h2 {
+        text-align: center;
+        color: #2e7d32;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+      button {
+        background: #2e7d32;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #256627;
+      }
+      #message {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+        min-height: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🌾 Login</h2>
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button onclick="login()">Login</button>
+      <p id="message"></p>
     </div>
-  </div>
 
-  <script>
-    const form = document.getElementById('loginForm');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    <script>
+      async function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (!username || !password) {
-        alert("Please enter both username and password!");
-        return;
-      }
-
-      try {
-        const res = await fetch('http://localhost:5001/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          alert('Login successful!');
-
-          // Save session info
-          localStorage.setItem("username", username);
-          localStorage.setItem("role", data.role);
-
-          // Redirect based on role
-          if (data.role === "farmer") {
-            window.location.href = "crop.html";
-          } else if (data.role === "admin") {
-            window.location.href = "admin.html";
-          } else if (data.role === "customer") {
-            window.location.href = "customer.html";
-          }
-
-        } else {
-          alert(data.message || 'Login failed');
+        if (!username || !password) {
+          document.getElementById("message").textContent =
+            "Please fill all fields!";
+          document.getElementById("message").style.color = "red";
+          return;
         }
-      } catch (err) {
-        console.error(err);
-        alert('Network error: ' + err.message);
+
+        try {
+          const res = await fetch("http://localhost:5000/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            // Store username for later use
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("role", data.role);
+
+            if (data.role === "admin") {
+              window.location.href = "admin.html";
+            } else if (data.role === "farmer") {
+              window.location.href = "farmer.html"; // or farmer-home.html
+            }
+          } else {
+            document.getElementById("message").textContent =
+              data.message || "Login failed!";
+            document.getElementById("message").style.color = "red";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("message").textContent =
+            "Server error! Make sure backend is running.";
+          document.getElementById("message").style.color = "red";
+        }
       }
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

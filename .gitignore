@@ -17,3 +17,6 @@ uploads/
 # OS / IDE junk
 .DS_Store
 Thumbs.db
+
+# Models
+models/*.h5
