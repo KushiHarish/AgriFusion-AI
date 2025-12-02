@@ -38,18 +38,15 @@
         top: 0;
         z-index: 100;
       }
-
       .header h1 {
         font-size: 28px;
         color: #ffeb3b;
       }
-
       .header-right {
         display: flex;
         gap: 15px;
         align-items: center;
       }
-
       .profile-btn,
       .logout-btn {
         padding: 10px 20px;
@@ -60,27 +57,22 @@
         transition: all 0.3s;
         font-size: 14px;
       }
-
       .profile-btn {
         background: #4caf50;
         color: white;
       }
-
       .profile-btn:hover {
         background: #45a049;
         transform: scale(1.05);
       }
-
       .logout-btn {
         background: #f44336;
         color: white;
       }
-
       .logout-btn:hover {
         background: #d32f2f;
         transform: scale(1.05);
       }
-
       /* Welcome Section */
       .welcome-section {
         text-align: center;
@@ -91,13 +83,11 @@
         backdrop-filter: blur(5px);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       }
-
       .welcome-section h2 {
         font-size: 32px;
         margin-bottom: 10px;
         color: #ffeb3b;
       }
-
       .farmer-info {
         display: flex;
         justify-content: center;
@@ -105,7 +95,6 @@
         margin-top: 20px;
         flex-wrap: wrap;
       }
-
       .info-item {
         background: rgba(255, 255, 255, 0.15);
         padding: 15px 25px;
@@ -114,29 +103,24 @@
         border: 1px solid rgba(255, 235, 59, 0.3);
         transition: all 0.3s;
       }
-
       .info-item:hover {
         transform: translateY(-5px);
         border-color: #ffeb3b;
       }
-
       .info-item strong {
         color: #ffd54f;
         display: block;
         margin-bottom: 5px;
         font-size: 14px;
       }
-
       .info-item span {
         font-size: 16px;
       }
-
       /* Dashboard Container */
       .dashboard-container {
         padding: 30px;
         min-height: calc(100vh - 300px);
       }
-
       .section-title {
         text-align: center;
         font-size: 28px;
@@ -144,7 +128,6 @@
         color: #ffeb3b;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
-
       .dashboard-cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -153,7 +136,6 @@
         margin: 0 auto;
         padding: 20px;
       }
-
       .card {
         background: rgba(255, 255, 255, 0.12);
         border-radius: 20px;
@@ -166,7 +148,6 @@
         position: relative;
         overflow: hidden;
       }
-
       .card::before {
         content: "";
         position: absolute;
@@ -182,24 +163,20 @@
         opacity: 0;
         transition: opacity 0.4s;
       }
-
       .card:hover::before {
         opacity: 1;
       }
-
       .card:hover {
         transform: translateY(-15px) scale(1.03);
         box-shadow: 0 15px 40px rgba(255, 235, 59, 0.4);
         border-color: #ffeb3b;
       }
-
       .card-icon {
         font-size: 60px;
         margin-bottom: 20px;
         display: block;
         animation: bounce 2s infinite;
       }
-
       @keyframes bounce {
         0%,
         100% {
@@ -927,13 +904,11 @@
           updateMessage.style.color = "#f44336";
         }
       }
-
       // Close profile modal
       function closeProfile() {
         document.getElementById("profileModal").style.display = "none";
         isEditMode = false;
       }
-
       // Close modal when clicking outside
       window.onclick = function (event) {
         const modal = document.getElementById("profileModal");
@@ -941,7 +916,6 @@
           closeProfile();
         }
       };
-
       // Logout function
       function logoutUser() {
         if (confirm("⚠️ Are you sure you want to logout?")) {

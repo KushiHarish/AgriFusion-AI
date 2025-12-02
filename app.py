@@ -177,8 +177,12 @@ def predict_disease():
         image = Image.open(io.BytesIO(file.read())).convert("RGB")
         w, h = image.size
         min_dim = min(w, h)
-        image = image.crop(((w-min_dim)/2, (h+min_dim)/2, (w+min_dim)/2, (h+min_dim)/2))
-        image = image.resize((224,224))
+        left = (w - min_dim) / 2
+        top = (h - min_dim) / 2
+        right = left + min_dim
+        bottom = top + min_dim
+        image = image.crop((left, top, right, bottom))
+        image = image.resize((224, 224))
         img_array = np.expand_dims(np.array(image)/255.0, axis=0)
 
         predictions = disease_model.predict(img_array)

@@ -13,7 +13,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 # 🌿 PATH CONFIGURATION
 # --------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASET_PATH = r"D:\AgriFusion\dataset"  # ✅ Update this path if needed
+DATASET_PATH = r"D:\AgriFusionF\AgriFusion-AI\data"  # ✅ Update this path if needed
 MODEL_SAVE_PATH = os.path.join(BASE_DIR, "models", "plant_disease_prediction_model.h5")
 CLASS_INDICES_PATH = os.path.join(BASE_DIR, "class_indices.json")
 

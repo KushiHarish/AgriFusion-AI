@@ -25,7 +25,6 @@
         min-height: 100vh;
       }
 
-      /* Header */
       .header {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
@@ -62,14 +61,12 @@
         font-size: 28px;
       }
 
-      /* Container */
       .container {
         max-width: 1400px;
         margin: 40px auto;
         padding: 30px;
       }
 
-      /* Crop Banner */
       .crop-banner {
         background: linear-gradient(135deg, #4caf50, #66bb6a);
         padding: 30px;
@@ -90,7 +87,6 @@
         color: #e8f5e9;
       }
 
-      /* Info Section */
       .info-section {
         background: rgba(255, 255, 255, 0.12);
         padding: 30px;
@@ -133,7 +129,6 @@
         margin-bottom: 5px;
       }
 
-      /* Section Title */
       .section-title {
         text-align: center;
         font-size: 28px;
@@ -142,7 +137,6 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
 
-      /* Rotation Cards Grid */
       .rotation-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -239,6 +233,28 @@
       .badge.short-duration {
         background: #2196f3;
         color: white;
+      }
+
+      /* Start Crop Button */
+      .start-crop-btn {
+        width: 100%;
+        margin-top: 20px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #2196f3, #42a5f5);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 16px;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+      }
+
+      .start-crop-btn:hover {
+        background: linear-gradient(135deg, #1976d2, #2196f3);
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
       }
 
       .loading {
@@ -651,7 +667,7 @@
         `;
       }
 
-      // Display rotation suggestions
+      // Display rotation suggestions (WITH START BUTTON)
       function displayRotationSuggestions(farmer) {
         const crop = farmer.cropChosen || "Wheat";
         const suggestions = rotationData[crop] || rotationData.Wheat;
@@ -690,6 +706,12 @@
                   })
                   .join("")}
               </div>
+
+              <button class="start-crop-btn" onclick="startThisCrop('${
+                suggestion.name
+              }')">
+                🚀 Start This Crop
+              </button>
             </div>
           `
             )
@@ -704,6 +726,12 @@
             </div>
           `;
         }
+      }
+
+      // Start selected crop (redirect to lifecycle page)
+      function startThisCrop(cropName) {
+        localStorage.setItem("selectedNextCrop", cropName);
+        window.location.href = "crop_lifecycle.html";
       }
 
       // Load data on page load
