@@ -25,7 +25,6 @@
         min-height: 100vh;
       }
 
-      /* Header */
       .header {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
@@ -62,14 +61,12 @@
         font-size: 28px;
       }
 
-      /* Container */
       .container {
         max-width: 1400px;
         margin: 40px auto;
         padding: 30px;
       }
 
-      /* Summary Cards */
       .summary-cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -133,7 +130,6 @@
         color: #2196f3;
       }
 
-      /* Section */
       .section {
         background: rgba(255, 255, 255, 0.12);
         padding: 30px;
@@ -152,7 +148,6 @@
         padding-bottom: 10px;
       }
 
-      /* Form */
       .transaction-form {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -226,7 +221,6 @@
         transform: scale(1.05);
       }
 
-      /* Tabs */
       .tabs {
         display: flex;
         gap: 10px;
@@ -254,7 +248,6 @@
         background: rgba(255, 235, 59, 0.2);
       }
 
-      /* Transaction List */
       .transactions-list {
         display: flex;
         flex-direction: column;
@@ -355,6 +348,13 @@
         margin-bottom: 15px;
       }
 
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #ffeb3b;
+        font-size: 18px;
+      }
+
       @media (max-width: 768px) {
         .header {
           flex-direction: column;
@@ -381,16 +381,13 @@
     </style>
   </head>
   <body>
-    <!-- Header -->
     <div class="header">
       <a href="farmer.html" class="back-btn">← Back to Dashboard</a>
       <h1>📊 Financial Balance Sheet</h1>
       <div style="width: 120px"></div>
     </div>
 
-    <!-- Main Container -->
     <div class="container">
-      <!-- Summary Cards -->
       <div class="summary-cards">
         <div class="summary-card income">
           <div class="icon">💰</div>
@@ -411,7 +408,6 @@
         </div>
       </div>
 
-      <!-- Add Transaction Section -->
       <div class="section">
         <h2>➕ Add New Transaction</h2>
         <form class="transaction-form" id="transactionForm">
@@ -463,7 +459,6 @@
         </form>
       </div>
 
-      <!-- Transactions History -->
       <div class="section">
         <h2>📋 Transaction History</h2>
 
@@ -478,18 +473,13 @@
         </div>
 
         <div class="transactions-list" id="transactionsList">
-          <div class="no-transactions">
-            <div class="no-transactions-icon">📊</div>
-            <h3 style="color: #999">No transactions yet</h3>
-            <p style="color: #666; margin-top: 10px">
-              Add your first transaction to start tracking your finances!
-            </p>
-          </div>
+          <div class="loading">⏳ Loading transactions...</div>
         </div>
       </div>
     </div>
 
     <script>
+      const API_URL = "http://localhost:5000";
       const username = localStorage.getItem("username");
 
       if (!username) {
@@ -497,7 +487,6 @@
         window.location.href = "login.html";
       }
 
-      // Categories
       const categories = {
         income: [
           "Crop Sales",
@@ -525,6 +514,7 @@
       const transactionForm = document.getElementById("transactionForm");
 
       let currentFilter = "all";
+      let allTransactions = [];
 
       // Update categories based on type
       typeSelect.addEventListener("change", () => {
@@ -542,51 +532,73 @@
       // Set default date to today
       document.getElementById("date").valueAsDate = new Date();
 
-      // Load transactions
-      const transactions = JSON.parse(
-        localStorage.getItem(`transactions_${username}`) || "[]"
-      );
-
       // Add transaction
-      transactionForm.addEventListener("submit", (e) => {
+      transactionForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const transaction = {
-          id: Date.now(),
+          username: username,
           type: document.getElementById("type").value,
           category: document.getElementById("category").value,
           amount: parseFloat(document.getElementById("amount").value),
           date: document.getElementById("date").value,
           description: document.getElementById("description").value,
-          createdAt: new Date().toISOString(),
         };
 
-        transactions.push(transaction);
-        localStorage.setItem(
-          `transactions_${username}`,
-          JSON.stringify(transactions)
-        );
+        try {
+          const response = await fetch(`${API_URL}/transaction`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(transaction),
+          });
 
-        alert("✅ Transaction added successfully!");
-        transactionForm.reset();
-        document.getElementById("date").valueAsDate = new Date();
-        categorySelect.innerHTML =
-          '<option value="">-- Select Category --</option>';
+          const data = await response.json();
 
-        loadTransactions();
-        updateSummary();
+          if (data.success) {
+            alert("✅ Transaction added successfully!");
+            transactionForm.reset();
+            document.getElementById("date").valueAsDate = new Date();
+            categorySelect.innerHTML =
+              '<option value="">-- Select Category --</option>';
+
+            await loadTransactions();
+            await updateSummary();
+          } else {
+            alert("❌ Error: " + data.message);
+          }
+        } catch (error) {
+          console.error("Error adding transaction:", error);
+          alert("❌ Failed to add transaction. Please try again.");
+        }
       });
 
-      // Load transactions
-      function loadTransactions() {
-        const storedTransactions = JSON.parse(
-          localStorage.getItem(`transactions_${username}`) || "[]"
-        );
+      // Load transactions from backend
+      async function loadTransactions() {
+        try {
+          const response = await fetch(`${API_URL}/transactions/${username}`);
+          const data = await response.json();
 
-        // Apply filter
-        let filteredTransactions = storedTransactions;
+          if (data.success) {
+            allTransactions = data.transactions;
+            displayTransactions();
+          }
+        } catch (error) {
+          console.error("Error loading transactions:", error);
+          document.getElementById("transactionsList").innerHTML = `
+            <div class="no-transactions">
+              <div class="no-transactions-icon">⚠️</div>
+              <h3 style="color: #f44336;">Error loading transactions</h3>
+              <p style="color: #999; margin-top: 10px;">Please check your connection and try again.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Display transactions based on filter
+      function displayTransactions() {
+        let filteredTransactions = allTransactions;
         if (currentFilter !== "all") {
-          filteredTransactions = storedTransactions.filter(
+          filteredTransactions = allTransactions.filter(
             (t) => t.type === currentFilter
           );
         }
@@ -603,11 +615,6 @@
           `;
           return;
         }
-
-        // Sort by date (newest first)
-        filteredTransactions.sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
-        );
 
         const html = filteredTransactions
           .map(
@@ -629,9 +636,9 @@
             )}
             </div>
             <div class="transaction-actions">
-              <button class="delete-btn" onclick="deleteTransaction(${
-                t.id
-              })">🗑️</button>
+              <button class="delete-btn" onclick="deleteTransaction('${
+                t._id
+              }')">🗑️</button>
             </div>
           </div>
         `
@@ -642,44 +649,45 @@
       }
 
       // Update summary
-      function updateSummary() {
-        const storedTransactions = JSON.parse(
-          localStorage.getItem(`transactions_${username}`) || "[]"
-        );
+      async function updateSummary() {
+        try {
+          const response = await fetch(
+            `${API_URL}/transactions/summary/${username}`
+          );
+          const data = await response.json();
 
-        const totalIncome = storedTransactions
-          .filter((t) => t.type === "income")
-          .reduce((sum, t) => sum + t.amount, 0);
+          if (data.success) {
+            const { totalIncome, totalExpense, netProfit } = data.summary;
 
-        const totalExpense = storedTransactions
-          .filter((t) => t.type === "expense")
-          .reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById(
+              "totalIncome"
+            ).textContent = `₹${totalIncome.toLocaleString("en-IN")}`;
+            document.getElementById(
+              "totalExpense"
+            ).textContent = `₹${totalExpense.toLocaleString("en-IN")}`;
 
-        const netProfit = totalIncome - totalExpense;
+            const netProfitElement = document.getElementById("netProfit");
+            netProfitElement.textContent = `₹${Math.abs(
+              netProfit
+            ).toLocaleString("en-IN")}`;
 
-        document.getElementById(
-          "totalIncome"
-        ).textContent = `₹${totalIncome.toLocaleString("en-IN")}`;
-        document.getElementById(
-          "totalExpense"
-        ).textContent = `₹${totalExpense.toLocaleString("en-IN")}`;
-
-        const netProfitElement = document.getElementById("netProfit");
-        netProfitElement.textContent = `₹${Math.abs(netProfit).toLocaleString(
-          "en-IN"
-        )}`;
-
-        if (netProfit >= 0) {
-          netProfitElement.style.color = "#4caf50";
-          netProfitElement.parentElement.querySelector(".icon").textContent =
-            "📈";
-        } else {
-          netProfitElement.style.color = "#f44336";
-          netProfitElement.parentElement.querySelector(".icon").textContent =
-            "📉";
-          netProfitElement.textContent = `-₹${Math.abs(
-            netProfit
-          ).toLocaleString("en-IN")}`;
+            if (netProfit >= 0) {
+              netProfitElement.style.color = "#4caf50";
+              netProfitElement.parentElement.querySelector(
+                ".icon"
+              ).textContent = "📈";
+            } else {
+              netProfitElement.style.color = "#f44336";
+              netProfitElement.parentElement.querySelector(
+                ".icon"
+              ).textContent = "📉";
+              netProfitElement.textContent = `-₹${Math.abs(
+                netProfit
+              ).toLocaleString("en-IN")}`;
+            }
+          }
+        } catch (error) {
+          console.error("Error updating summary:", error);
         }
       }
 
@@ -687,35 +695,38 @@
       function filterTransactions(filter) {
         currentFilter = filter;
 
-        // Update tab active state
         document.querySelectorAll(".tab").forEach((tab) => {
           tab.classList.remove("active");
         });
         event.target.classList.add("active");
 
-        loadTransactions();
+        displayTransactions();
       }
 
       // Delete transaction
-      function deleteTransaction(id) {
+      async function deleteTransaction(id) {
         if (!confirm("Are you sure you want to delete this transaction?")) {
           return;
         }
 
-        const storedTransactions = JSON.parse(
-          localStorage.getItem(`transactions_${username}`) || "[]"
-        );
-        const updatedTransactions = storedTransactions.filter(
-          (t) => t.id !== id
-        );
-        localStorage.setItem(
-          `transactions_${username}`,
-          JSON.stringify(updatedTransactions)
-        );
+        try {
+          const response = await fetch(`${API_URL}/transaction/${id}`, {
+            method: "DELETE",
+          });
 
-        alert("✅ Transaction deleted successfully!");
-        loadTransactions();
-        updateSummary();
+          const data = await response.json();
+
+          if (data.success) {
+            alert("✅ Transaction deleted successfully!");
+            await loadTransactions();
+            await updateSummary();
+          } else {
+            alert("❌ Error: " + data.message);
+          }
+        } catch (error) {
+          console.error("Error deleting transaction:", error);
+          alert("❌ Failed to delete transaction. Please try again.");
+        }
       }
 
       // Format date

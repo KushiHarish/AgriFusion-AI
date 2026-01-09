@@ -1,4 +1,3 @@
-# app.py
 import io
 import os
 import json
@@ -12,6 +11,18 @@ import tensorflow as tf
 
 app = Flask(__name__)
 CORS(app)
+def extract_crop_name(label):
+    label = label.lower()
+
+    if "potato" in label: return "potato"
+    if "tomato" in label: return "tomato"
+    if "pepper" in label or "bell" in label: return "pepper"
+    if "grape" in label: return "grapes"
+    if "citrus" in label or "orange" in label: return "orange"
+    if "corn" in label or "maize" in label: return "maize"
+
+    return "unknown"
+
 
 # ---------------- Crop Model ----------------
 CROP_MODEL_PATH = "models/crop_model.pkl"
@@ -167,39 +178,84 @@ def get_fertilizer():
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
+
+
 @app.route("/predict_disease", methods=["POST"])
 def predict_disease():
     try:
         file = request.files["image"]
+        user_crop = request.form.get("user_crop", "").lower()
+
         if not file or disease_model is None:
             return jsonify({"error": "No image uploaded or disease model missing"}), 400
 
         image = Image.open(io.BytesIO(file.read())).convert("RGB")
+
+        # FIXED Cropping
         w, h = image.size
         min_dim = min(w, h)
-        left = (w - min_dim) / 2
-        top = (h - min_dim) / 2
-        right = left + min_dim
-        bottom = top + min_dim
-        image = image.crop((left, top, right, bottom))
-        image = image.resize((224, 224))
-        img_array = np.expand_dims(np.array(image)/255.0, axis=0)
+        image = image.crop((
+            (w - min_dim) / 2,
+            (h - min_dim) / 2,
+            (w + min_dim) / 2,
+            (h + min_dim) / 2,
+        ))
 
+        image = image.resize((224, 224))
+        img_array = np.expand_dims(np.array(image) / 255.0, axis=0)
+
+        # Model Prediction
         predictions = disease_model.predict(img_array)
         predicted_class = str(np.argmax(predictions))
+        confidence = float(np.max(predictions) * 100)
         disease_name = label_map.get(int(predicted_class), "Unknown")
 
+        # Extract crop from prediction
+        predicted_crop = extract_crop_name(disease_name)
+
+        # -------------------------------
+        # CROP MISMATCH HANDLING
+        # -------------------------------
+        if user_crop and predicted_crop != user_crop:
+            return jsonify({
+                "error": "crop_mismatch",
+                "predictedCrop": predicted_crop,
+                "selectedCrop": user_crop,
+                "prediction": disease_name,
+                "confidence": confidence,
+                "reasons": [
+                    "Wrong crop image uploaded",
+                    "Model confusion due to similar symptoms",
+                    "Unclear or blurry leaf image",
+                    "Leaf from a different variety",
+                ]
+            }), 200
+
+        # Normal prediction handling
         if disease_name in disease_solutions:
             solution = disease_solutions[disease_name]
         elif "healthy" in disease_name.lower():
-            solution = {"type":"None","solution":"Crop is healthy.","organic":"No treatment required."}
+            solution = {
+                "type": "None",
+                "solution": "Crop is healthy.",
+                "organic": "No treatment required."
+            }
         else:
-            solution = {"type":"General Advice","solution":"Consult an expert.","organic":""}
+            solution = {
+                "type": "General Advice",
+                "solution": "Consult an expert.",
+                "organic": ""
+            }
 
-        return jsonify({"prediction": disease_name,"solution": solution})
+        return jsonify({
+            "prediction": disease_name,
+            "solution": solution,
+            "confidence": confidence,
+            "detectedCrop": predicted_crop 
+        })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
